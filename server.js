@@ -1,4 +1,14 @@
 // server.js - Backend completo per Kayak Instructor App
+// Aggiungi questa riga dopo le importazioni
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// E modifica la riga del database da:
+// const db = new sqlite3.Database('./kayak.db', ...)
+// a:
+const db = new sqlite3.Database(path.join(__dirname, 'kayak.db'), (err) => {
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const jwt = require('jsonwebtoken');
