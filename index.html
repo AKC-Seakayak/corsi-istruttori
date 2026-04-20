@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <meta name="theme-color" content="#2c5f8a">
+  <title>Kayak Instructor - Valutazioni Allievi</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2c5f8a;
+      --primary-dark: #1a3a52;
+      --secondary: #4a90e2;
+      --success: #27ae60;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --light: #ecf0f1;
+      --dark: #34495e;
+      --gray: #95a5a6;
+      --white: #ffffff;
+      --shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: var(--light);
+      color: var(--dark);
+      margin: 0;
+      padding: 20px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button, input, textarea, select {
+      font-family: inherit;
+      font-size: 16px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      transition: all 0.2s ease;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    input, textarea {
+      border: 1px solid var(--gray);
+      border-radius: 8px;
+      padding: 10px;
+      width: 100%;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(44,95,138,0.1);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      button {
+        padding: 12px 20px;
+      }
+      
+      input, textarea, button {
+        font-size: 16px;
+      }
+    }
+
+    /* Loading spinner */
+    .loading-spinner {
+      text-align: center;
+      padding: 40px;
+      font-size: 18px;
+      color: var(--primary);
+    }
+
+    /* Connection Status */
+    .connection-status {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 8px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .connection-status.online {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .connection-status.offline {
+      background-color: var(--warning);
+      color: white;
+    }
+
+    /* Login */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 20px;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .kayak-icon {
+      font-size: 60px;
+      margin-bottom: 10px;
+    }
+
+    .login-header h1 {
+      color: var(--primary);
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .login-header p {
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--dark);
+      font-weight: 500;
+    }
+
+    .error-message {
+      background: var(--danger);
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* Student List */
+    .student-list-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--gray);
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .header h1 {
+      color: var(--primary);
+      margin-bottom: 5px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .search-bar {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--gray);
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .create-btn {
+      background: var(--success);
+      color: white;
+      padding: 12px 24px;
+    }
+
+    .sync-btn {
+      background: var(--warning);
+      color: white;
+      padding: 12px 24px;
+    }
+
+    .offline-banner {
+      background: var(--warning);
+      color: white;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .student-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .student-card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s;
+    }
+
+    .student-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .student-info h3 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .student-info p {
+      color: var(--dark);
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .cert-badges {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .badge {
+      background: var(--light);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--dark);
+    }
+
+    .student-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .view-btn, .edit-btn, .delete-btn {
+      flex: 1;
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    .view-btn { background: var(--primary); color: white; }
+    .edit-btn { background: var(--secondary); color: white; }
+    .delete-btn { background: var(--danger); color: white; }
+    .logout-btn { background: var(--danger); color: white; }
+    .settings-btn { background: var(--secondary); color: white; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 25px;
+      border-bottom: 1px solid var(--light);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--gray);
+    }
+
+    .student-form {
+      padding: 25px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .cancel-btn { flex: 1; background: var(--gray); color: white; }
+    .save-btn { flex: 1; background: var(--success); color: white; }
+
+    /* Evaluation Sheet */
+    .evaluation-sheet {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--gray);
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .sheet-header h1 {
+      color: var(--primary);
+      font-size: 24px;
+    }
+
+    .back-btn {
+      background: var(--gray);
+      color: white;
+      padding: 10px 20px;
+    }
+
+    .sheet-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .save-all-btn { background: var(--success); color: white; }
+    .reset-all-btn { background: var(--danger); color: white; }
+
+    .skills-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    /* Skill Row */
+    .skill-row {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow);
+      transition: all 0.2s ease;
+    }
+
+    .skill-row.dirty {
+      background: #fff9e6;
+      border-left: 4px solid var(--warning);
+    }
+
+    .skill-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .skill-number {
+      background: var(--primary);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .skill-name {
+      flex: 1;
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 16px;
+    }
+
+    .skill-score {
+      font-weight: bold;
+      font-size: 18px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .score-low { background: #fee; color: var(--danger); }
+    .score-medium { background: #fff3e0; color: var(--warning); }
+    .score-high { background: #e8f5e9; color: var(--success); }
+
+    .reset-skill-btn, .notes-toggle-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .notes-toggle-btn.has-notes {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Slider */
+    .slider-container {
+      width: 100%;
+      padding: 10px 0;
+    }
+
+    .slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: var(--gray);
+      outline: none;
+      margin: 10px 0;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: var(--shadow);
+    }
+
+    .slider-marks {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+
+    .slider-mark {
+      width: 30px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--gray);
+      cursor: pointer;
+    }
+
+    .slider-mark.active {
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .skill-notes {
+      margin-top: 15px;
+    }
+
+    .skill-notes textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid var(--light);
+      border-radius: 8px;
+      resize: vertical;
+    }
+
+    .skill-meta {
+      margin-top: 10px;
+      text-align: right;
+      color: var(--gray);
+      font-size: 11px;
+    }
+
+    .save-status {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--success);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    @media (max-width: 768px) {
+      .skill-row { padding: 15px; }
+      .skill-name { font-size: 14px; }
+      .slider-mark { width: 24px; font-size: 10px; }
+      .slider::-webkit-slider-thumb { width: 32px; height: 32px; }
+      .sheet-header { flex-direction: column; align-items: stretch; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-router-dom@6.20.0/umd/react-router-dom.development.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios@1.6.2/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/babel-standalone@6.26.0/babel.min.js"></script>
+
+<script type="text/babel">
+// SKILLS Constants
+const SKILLS = [
+  "Pagaiata avanti groenlandese",
+  "Pagaiata indietro groenlandese",
+  "Pagaiata avanti europea",
+  "Pagaiata indietro europea",
+  "Pagaiata circolare 360°",
+  "Spostamento laterale a un tempo",
+  "Spostamento laterale continuo",
+  "Limonata di poppa",
+  "Appoggio basso",
+  "Trasporto kayak",
+  "Imbarco asciutto",
+  "Imbarco cowboy",
+  "Imbarco bilanciere",
+  "Sbarco bilanciere",
+  "Sbarco cowboy",
+  "Uscita bagnata",
+  "Autosalvataggio cowboy",
+  "Autosalvataggio paddle float / Rescue T",
+  "Inclinazione scafo con equilibrio",
+  "Inclinazione scafo con perdita equilibrio"
+];
+
+// API Service
+const api = axios.create({
+  baseURL: '/api',
+  withCredentials: true
+});
+
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.hash = '#login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Offline Storage
+const DB_NAME = 'KayakAppDB';
+const DB_VERSION = 1;
+let db = null;
+
+function initDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      db = request.result;
+      resolve(db);
+    };
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('students')) {
+        db.createObjectStore('students', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('evaluations')) {
+        const evalStore = db.createObjectStore('evaluations', { keyPath: 'id' });
+        evalStore.createIndex('studentId', 'studentId');
+      }
+      if (!db.objectStoreNames.contains('pendingOps')) {
+        db.createObjectStore('pendingOps', { keyPath: 'id', autoIncrement: true });
+      }
+    };
+  });
+}
+
+async function saveStudentsOffline(students) {
+  const tx = db.transaction('students', 'readwrite');
+  const store = tx.objectStore('students');
+  for (const student of students) await store.put(student);
+  return tx.complete;
+}
+
+async function getStudentsOffline() {
+  const tx = db.transaction('students', 'readonly');
+  const store = tx.objectStore('students');
+  return store.getAll();
+}
+
+async function saveEvaluationsOffline(studentId, evaluations) {
+  const tx = db.transaction('evaluations', 'readwrite');
+  const store = tx.objectStore('evaluations');
+  for (const eval_ of evaluations) {
+    await store.put({ ...eval_, studentId, id: `${studentId}_${eval_.skillName}` });
+  }
+  return tx.complete;
+}
+
+async function getEvaluationsOffline(studentId) {
+  const tx = db.transaction('evaluations', 'readonly');
+  const store = tx.objectStore('evaluations');
+  const index = store.index('studentId');
+  return index.getAll(studentId);
+}
+
+async function addPendingOperation(operation) {
+  const tx = db.transaction('pendingOps', 'readwrite');
+  const store = tx.objectStore('pendingOps');
+  await store.add({ ...operation, timestamp: Date.now(), retries: 0 });
+  return tx.complete;
+}
+
+async function getPendingOperations() {
+  const tx = db.transaction('pendingOps', 'readonly');
+  const store = tx.objectStore('pendingOps');
+  return store.getAll();
+}
+
+async function removePendingOperation(id) {
+  const tx = db.transaction('pendingOps', 'readwrite');
+  const store = tx.objectStore('pendingOps');
+  await store.delete(id);
+  return tx.complete;
+}
+
+// Hooks
+function useDebounce(callback, delay) {
+  const timeoutRef = React.useRef(null);
+  React.useEffect(() => {
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
+  }, []);
+  return React.useCallback((...args) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => callback(...args), delay);
+  }, [callback, delay]);
+}
+
+// Auth Context
+const AuthContext = React.createContext();
+
+function useAuth() {
+  return React.useContext(AuthContext);
+}
+
+function AuthProvider({ children }) {
+  const [user, setUser] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      api.get('/auth/me').then(res => {
+        setUser(res.data.user);
+      }).catch(() => {
+        localStorage.removeItem('token');
+        delete api.defaults.headers.common['Authorization'];
+      }).finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  const login = async (username, password) => {
+    const res = await api.post('/auth/login', { username, password });
+    const { token, user } = res.data;
+    localStorage.setItem('token', token);
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    setUser(user);
+    return user;
+  };
+
+  const logout = async () => {
+    await api.post('/auth/logout');
+    localStorage.removeItem('token');
+    delete api.defaults.headers.common['Authorization'];
+    setUser(null);
+  };
+
+  const changePassword = async (oldPassword, newPassword) => {
+    await api.post('/auth/change-password', { oldPassword, newPassword });
+  };
+
+  return React.createElement(AuthContext.Provider, { value: { user, loading, login, logout, changePassword } }, children);
+}
+
+// Offline Context
+const OfflineContext = React.createContext();
+
+function useOffline() {
+  return React.useContext(OfflineContext);
+}
+
+function OfflineProvider({ children }) {
+  const [isOnline, setIsOnline] = React.useState(navigator.onLine);
+  const [isSyncing, setIsSyncing] = React.useState(false);
+  const [pendingOps, setPendingOps] = React.useState(0);
+
+  const loadPendingOps = async () => {
+    const ops = await getPendingOperations();
+    setPendingOps(ops.length);
+  };
+
+  const syncNow = React.useCallback(async () => {
+    if (!isOnline) return;
+    setIsSyncing(true);
+    try {
+      const ops = await getPendingOperations();
+      for (const op of ops) {
+        try {
+          if (op.type === 'UPDATE_EVALUATION') {
+            await api.put(`/students/${op.studentId}/evaluations/${encodeURIComponent(op.skillName)}`, op.data);
+          }
+          await removePendingOperation(op.id);
+        } catch (e) { console.error('Sync failed:', e); }
+      }
+      const res = await api.get('/students');
+      await saveStudentsOffline(res.data);
+      for (const student of res.data) {
+        const evalRes = await api.get(`/students/${student.id}/evaluations`);
+        await saveEvaluationsOffline(student.id, evalRes.data);
+      }
+      await loadPendingOps();
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [isOnline]);
+
+  React.useEffect(() => {
+    initDB().then(() => {
+      loadPendingOps();
+      window.addEventListener('online', () => { setIsOnline(true); syncNow(); });
+      window.addEventListener('offline', () => setIsOnline(false));
+    });
+  }, []);
+
+  return React.createElement(OfflineContext.Provider, { value: { isOnline, isSyncing, pendingOps, syncNow } }, children);
+}
+
+// Slider Component
+function Slider({ value, onChange, min = 0, max = 10 }) {
+  return React.createElement('div', { className: 'slider-container' },
+    React.createElement('input', {
+      type: 'range', min, max, step: 1, value,
+      onChange: (e) => onChange(parseInt(e.target.value)),
+      className: 'slider'
+    }),
+    React.createElement('div', { className: 'slider-marks' },
+      [0,1,2,3,4,5,6,7,8,9,10].map(v => 
+        React.createElement('span', {
+          key: v,
+          className: `slider-mark ${v === value ? 'active' : ''}`,
+          onClick: () => onChange(v)
+        }, v)
+      )
+    )
+  );
+}
+
+// Skill Row Component
+function SkillRow({ skillName, index, score, notes, lastUpdated, updatedBy, isDirty, onScoreChange, onNotesChange, onReset }) {
+  const [showNotes, setShowNotes] = React.useState(false);
+  const getScoreColor = (s) => s <= 3 ? 'score-low' : s <= 6 ? 'score-medium' : 'score-high';
+  
+  return React.createElement('div', { className: `skill-row ${isDirty ? 'dirty' : ''}` },
+    React.createElement('div', { className: 'skill-header' },
+      React.createElement('div', { className: 'skill-number' }, index),
+      React.createElement('div', { className: 'skill-name' }, skillName),
+      React.createElement('div', { className: `skill-score ${getScoreColor(score)}` }, `${score}/10`),
+      React.createElement('button', { onClick: onReset, className: 'reset-skill-btn' }, '↺'),
+      React.createElement('button', { onClick: () => setShowNotes(!showNotes), className: `notes-toggle-btn ${notes ? 'has-notes' : ''}` }, '📝')
+    ),
+    React.createElement('div', { className: 'skill-controls' },
+      React.createElement(Slider, { value: score, onChange: onScoreChange })
+    ),
+    showNotes && React.createElement('div', { className: 'skill-notes' },
+      React.createElement('textarea', { value: notes, onChange: (e) => onNotesChange(e.target.value), placeholder: 'Note aggiuntive...', rows: 3 })
+    ),
+    lastUpdated && React.createElement('div', { className: 'skill-meta' },
+      React.createElement('small', null, `Ultimo aggiornamento: ${new Date(lastUpdated).toLocaleString()} da ${updatedBy || 'Sconosciuto'}`)
+    )
+  );
+}
+
+// Connection Status Component
+function ConnectionStatus() {
+  const { isOnline, pendingOps, isSyncing } = useOffline();
+  const [showStatus, setShowStatus] = React.useState(true);
+  
+  React.useEffect(() => {
+    const timer = setTimeout(() => setShowStatus(false), 5000);
+    if (!isOnline || isSyncing) { setShowStatus(true); clearTimeout(timer); }
+    return () => clearTimeout(timer);
+  }, [isOnline, isSyncing]);
+  
+  if (!showStatus && isOnline && !isSyncing && pendingOps === 0) return null;
+  
+  return React.createElement('div', { className: `connection-status ${isOnline ? 'online' : 'offline'}` },
+    (!isOnline || isSyncing) && React.createElement('span', { className: 'status-icon' }, isSyncing ? '🔄' : '📡'),
+    React.createElement('span', { className: 'status-text' },
+      !isOnline && 'Modalità offline - ',
+      isSyncing && 'Sincronizzazione in corso...',
+      !isOnline && !isSyncing && pendingOps > 0 && `${pendingOps} operazioni in attesa`,
+      isOnline && !isSyncing && pendingOps === 0 && 'Connesso'
+    )
+  );
+}
+
+// Login Component
+function LoginForm() {
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [error, setError] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const { login } = useAuth();
+  const navigate = ReactRouterDOM.useNavigate();
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await login(username, password);
+      navigate('/students');
+    } catch { setError('Credenziali non valide'); }
+    finally { setLoading(false); }
+  };
+  
+  return React.createElement('div', { className: 'login-container' },
+    React.createElement('div', { className: 'login-card' },
+      React.createElement('div', { className: 'login-header' },
+        React.createElement('div', { className: 'kayak-icon' }, '🛶'),
+        React.createElement('h1', null, 'Kayak Instructor'),
+        React.createElement('p', null, 'Sistema valutazione allievi')
+      ),
+      React.createElement('form', { onSubmit: handleSubmit },
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', null, 'Username'),
+          React.createElement('input', { type: 'text', value: username, onChange: (e) => setUsername(e.target.value), required: true, autoFocus: true })
+        ),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', null, 'Password'),
+          React.createElement('input', { type: 'password', value: password, onChange: (e) => setPassword(e.target.value), required: true })
+        ),
+        error && React.createElement('div', { className: 'error-message' }, error),
+        React.createElement('button', { type: 'submit', disabled: loading, className: 'login-btn' }, loading ? 'Accesso...' : 'Accedi')
+      ),
+      React.createElement('div', { style: { marginTop: 20, textAlign: 'center', fontSize: 12, color: '#95a5a6' } },
+        React.createElement('small', null, 'Credenziali: admin / admin123')
+      )
+    )
+  );
+}
+
+// Change Password Component
+function ChangePassword() {
+  const [oldPassword, setOldPassword] = React.useState('');
+  const [newPassword, setNewPassword] = React.useState('');
+  const [confirmPassword, setConfirmPassword] = React.useState('');
+  const [error, setError] = React.useState('');
+  const [success, setSuccess] = React.useState('');
+  const { changePassword } = useAuth();
+  const navigate = ReactRouterDOM.useNavigate();
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) return setError('Le password non coincidono');
+    if (newPassword.length < 6) return setError('La password deve essere almeno 6 caratteri');
+    try {
+      await changePassword(oldPassword, newPassword);
+      setSuccess('Password modificata!');
+      setTimeout(() => navigate('/students'), 2000);
+    } catch (err) { setError(err.response?.data?.error || 'Errore'); }
+  };
+  
+  return React.createElement('div', { style: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ecf0f1', padding: 20 } },
+    React.createElement('div', { style: { background: 'white', borderRadius: 20, padding: 40, maxWidth: 450, width: '100%' } },
+      React.createElement('h2', { style: { color: '#2c5f8a', marginBottom: 30, textAlign: 'center' } }, 'Cambia Password'),
+      React.createElement('form', { onSubmit: handleSubmit },
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', null, 'Password attuale'),
+          React.createElement('input', { type: 'password', value: oldPassword, onChange: (e) => setOldPassword(e.target.value), required: true })
+        ),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', null, 'Nuova password'),
+          React.createElement('input', { type: 'password', value: newPassword, onChange: (e) => setNewPassword(e.target.value), required: true })
+        ),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', null, 'Conferma nuova password'),
+          React.createElement('input', { type: 'password', value: confirmPassword, onChange: (e) => setConfirmPassword(e.target.value), required: true })
+        ),
+        error && React.createElement('div', { className: 'error-message' }, error),
+        success && React.createElement('div', { style: { background: '#27ae60', color: 'white', padding: 10, borderRadius: 8, marginBottom: 20, textAlign: 'center' } }, success),
+        React.createElement('div', { className: 'form-actions' },
+          React.createElement('button', { type: 'button', onClick: () => navigate('/students'), className: 'cancel-btn' }, 'Annulla'),
+          React.createElement('button', { type: 'submit', className: 'save-btn' }, 'Salva')
+        )
+      )
+    )
+  );
+}
+
+// Student Form Component
+function StudentForm({ student, onSave, onClose }) {
+  const [formData, setFormData] = React.useState({
+    firstName: student?.firstName || '',
+    lastName: student?.lastName || '',
+    address: student?.address || '',
+    birthDate: student?.birthDate ? student.birthDate.split('T')[0] : '',
+    medicalCert: student?.medicalCert || false,
+    blsdCert: student?.blsdCert || false,
+    otherCerts: student?.otherCerts || ''
+  });
+  
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
+  
+  return React.createElement('div', { className: 'modal-overlay', onClick: onClose },
+    React.createElement('div', { className: 'modal-content', onClick: (e) => e.stopPropagation() },
+      React.createElement('div', { className: 'modal-header' },
+        React.createElement('h2', null, student ? 'Modifica Allievo' : 'Nuovo Allievo'),
+        React.createElement('button', { className: 'close-btn', onClick: onClose }, '✕')
+      ),
+      React.createElement('form', { onSubmit: (e) => { e.preventDefault(); onSave(formData); }, className: 'student-form' },
+        React.createElement('div', { className: 'form-row' },
+          React.createElement('div', { className: 'form-group' },
+            React.createElement('label', null, 'Nome *'),
+            React.createElement('input', { type: 'text', name: 'firstName', value: formData.firstName, onChange: handleChange, required: true })
+          ),
+          React.createElement('div', { className: 'form-group' },
+            React.createElement('label', null, 'Cognome *'),
+            React.createElement('input', { type: 'text', name: 'lastName', value: formData.lastName, onChange: handleChange, required: true })
+          )
+        ),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', null, 'Indirizzo'),
+          React.createElement('input', { type: 'text', name: 'address', value: formData.address, onChange: handleChange })
+        ),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', null, 'Data di nascita *'),
+          React.createElement('input', { type: 'date', name: 'birthDate', value: formData.birthDate, onChange: handleChange, required: true })
+        ),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', { className: 'checkbox-label' },
+            React.createElement('input', { type: 'checkbox', name: 'medicalCert', checked: formData.medicalCert, onChange: handleChange }),
+            ' Certificato medico sportivo'
+          )
+        ),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', { className: 'checkbox-label' },
+            React.createElement('input', { type: 'checkbox', name: 'blsdCert', checked: formData.blsdCert, onChange: handleChange }),
+            ' Certificazione BLSD'
+          )
+        ),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', null, 'Altri brevetti'),
+          React.createElement('textarea', { name: 'otherCerts', value: formData.otherCerts, onChange: handleChange, rows: 3, placeholder: 'Inserisci altri brevetti...' })
+        ),
+        React.createElement('div', { className: 'form-actions' },
+          React.createElement('button', { type: 'button', onClick: onClose, className: 'cancel-btn' }, 'Annulla'),
+          React.createElement('button', { type: 'submit', className: 'save-btn' }, 'Salva')
+        )
+      )
+    )
+  );
+}
+
+// Student List Component
+function StudentList() {
+  const [students, setStudents] = React.useState([]);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [showForm, setShowForm] = React.useState(false);
+  const [editingStudent, setEditingStudent] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const { user, logout } = useAuth();
+  const { isOnline, syncNow, isSyncing } = useOffline();
+  const navigate = ReactRouterDOM.useNavigate();
+  
+  const loadStudents = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      let data;
+      if (isOnline) {
+        const res = await api.get('/students');
+        data = res.data;
+        await saveStudentsOffline(data);
+      } else {
+        data = await getStudentsOffline();
+      }
+      setStudents(data);
+    } catch (error) {
+      if (!isOnline) setStudents(await getStudentsOffline());
+    } finally {
+      setLoading(false);
+    }
+  }, [isOnline]);
+  
+  React.useEffect(() => { loadStudents(); }, [loadStudents]);
+  
+  const filtered = students.filter(s => `${s.firstName} ${s.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()));
+  
+  const handleCreate = async (data) => {
+    if (isOnline) {
+      await api.post('/students', data);
+      await loadStudents();
+    } else {
+      const tempId = `temp_${Date.now()}`;
+      const newStudent = { ...data, id: tempId };
+      await saveStudentsOffline([...students, newStudent]);
+      await addPendingOperation({ type: 'CREATE_STUDENT', data });
+      setStudents([...students, newStudent]);
+    }
+    setShowForm(false);
+  };
+  
+  const handleUpdate = async (data) => {
+    if (isOnline) {
+      await api.put(`/students/${editingStudent.id}`, data);
+      await loadStudents();
+    } else {
+      await addPendingOperation({ type: 'UPDATE_STUDENT', entityId: editingStudent.id, data });
+      const updated = students.map(s => s.id === editingStudent.id ? { ...s, ...data } : s);
+      await saveStudentsOffline(updated);
+      setStudents(updated);
+    }
+    setEditingStudent(null);
+  };
+  
+  const handleDelete = async (student) => {
+    if (!confirm(`Eliminare ${student.firstName} ${student.lastName}?`)) return;
+    if (isOnline) {
+      await api.delete(`/students/${student.id}`);
+      await loadStudents();
+    } else {
+      await addPendingOperation({ type: 'DELETE_STUDENT', entityId: student.id });
+      const filtered = students.filter(s => s.id !== student.id);
+      await saveStudentsOffline(filtered);
+      setStudents(filtered);
+    }
+  };
+  
+  return React.createElement('div', { className: 'student-list-container' },
+    React.createElement('div', { className: 'header' },
+      React.createElement('div', null,
+        React.createElement('h1', null, 'Gestione Allievi Kayak'),
+        React.createElement('p', null, `Benvenuto, ${user?.fullName}`)
+      ),
+      React.createElement('div', { className: 'header-actions' },
+        React.createElement('button', { onClick: () => navigate('/change-password'), className: 'settings-btn' }, '🔑 Cambia Password'),
+        React.createElement('button', { onClick: logout, className: 'logout-btn' }, '🚪 Logout')
+      )
+    ),
+    React.createElement('div', { className: 'controls' },
+      React.createElement('div', { className: 'search-bar' },
+        React.createElement('input', { type: 'text', placeholder: 'Cerca allievo...', value: searchTerm, onChange: (e) => setSearchTerm(e.target.value), className: 'search-input' })
+      ),
+      React.createElement('div', { className: 'action-buttons' },
+        React.createElement('button', { onClick: () => setShowForm(true), className: 'create-btn' }, '+ Nuovo Allievo'),
+        !isOnline && React.createElement('button', { onClick: syncNow, disabled: isSyncing, className: 'sync-btn' }, isSyncing ? 'Sincronizzazione...' : '🔄 Sincronizza')
+      )
+    ),
+    !isOnline && React.createElement('div', { className: 'offline-banner' }, '⚠️ Modalità offline - Le modifiche verranno sincronizzate'),
+    loading ? React.createElement('div', { className: 'loading-spinner' }, 'Caricamento...') :
+      React.createElement('div', { className: 'student-grid' }, filtered.map(student =>
+        React.createElement('div', { key: student.id, className: 'student-card' },
+          React.createElement('div', { className: 'student-info' },
+            React.createElement('h3', null, `${student.firstName} ${student.lastName}`),
+            React.createElement('p', null, `📅 Nato: ${new Date(student.birthDate).toLocaleDateString()}`),
+            React.createElement('div', { className: 'cert-badges' },
+              student.medicalCert && React.createElement('span', { className: 'badge' }, '🏥 Medico'),
+              student.blsdCert && React.createElement('span', { className: 'badge' }, '🫀 BLSD')
+            )
+          ),
+          React.createElement('div', { className: 'student-actions' },
+            React.createElement('button', { onClick: () => navigate(`/students/${student.id}`), className: 'view-btn' }, '📊 Valutazioni'),
+            React.createElement('button', { onClick: () => setEditingStudent(student), className: 'edit-btn' }, '✏️ Modifica'),
+            React.createElement('button', { onClick: () => handleDelete(student), className: 'delete-btn' }, '🗑️ Elimina')
+          )
+        )
+      )),
+    (showForm || editingStudent) && React.createElement(StudentForm, {
+      student: editingStudent,
+      onSave: editingStudent ? handleUpdate : handleCreate,
+      onClose: () => { setShowForm(false); setEditingStudent(null); }
+    })
+  );
+}
+
+// Evaluation Sheet Component
+function EvaluationSheet() {
+  const { id } = ReactRouterDOM.useParams();
+  const navigate = ReactRouterDOM.useNavigate();
+  const { user } = useAuth();
+  const { isOnline } = useOffline();
+  const [student, setStudent] = React.useState(null);
+  const [evaluations, setEvaluations] = React.useState({});
+  const [loading, setLoading] = React.useState(true);
+  const [saving, setSaving] = React.useState(false);
+  const [lastSaved, setLastSaved] = React.useState(null);
+  const [dirtyFields, setDirtyFields] = React.useState(new Set());
+  
+  const debouncedSave = useDebounce(async (studentId, skillName, score, notes) => {
+    if (!isOnline) {
+      await addPendingOperation({ type: 'UPDATE_EVALUATION', studentId, skillName, data: { score, notes } });
+      setLastSaved(new Date());
+      return;
+    }
+    try {
+      await api.put(`/students/${studentId}/evaluations/${encodeURIComponent(skillName)}`, { score, notes });
+      const allEvals = Object.entries(evaluations).map(([s, d]) => ({ skillName: s, score: d.score, notes: d.notes, studentId }));
+      await saveEvaluationsOffline(studentId, allEvals);
+      setLastSaved(new Date());
+      setDirtyFields(prev => { const newSet = new Set(prev); newSet.delete(skillName); return newSet; });
+    } catch (error) {
+      await addPendingOperation({ type: 'UPDATE_EVALUATION', studentId, skillName, data: { score, notes } });
+    }
+  }, 1500);
+  
+  React.useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        let studentData, evalData;
+        if (isOnline) {
+          const [sRes, eRes] = await Promise.all([api.get(`/students/${id}`), api.get(`/students/${id}/evaluations`)]);
+          studentData = sRes.data;
+          evalData = eRes.data;
+          await saveStudentsOffline([studentData]);
+          await saveEvaluationsOffline(id, evalData);
+        } else {
+          const students = await getStudentsOffline();
+          studentData = students.find(s => s.id === id);
+          evalData = await getEvaluationsOffline(id);
+        }
+        setStudent(studentData);
+        const evalMap = {};
+        evalData.forEach(e => { evalMap[e.skillName] = { score: e.score, notes: e.notes || '', lastUpdated: e.lastUpdated, updatedBy: e.updatedBy }; });
+        SKILLS.forEach(s => { if (!evalMap[s]) evalMap[s] = { score: 0, notes: '' }; });
+        setEvaluations(evalMap);
+      } catch (error) { alert('Errore caricamento dati'); }
+      finally { setLoading(false); }
+    };
+    loadData();
+  }, [id, isOnline]);
+  
+  const handleScoreChange = (skillName, score) => {
+    setEvaluations(prev => ({ ...prev, [skillName]: { ...prev[skillName], score, lastUpdated: new Date().toISOString(), updatedBy: user?.fullName } }));
+    setDirtyFields(prev => new Set(prev).add(skillName));
+    debouncedSave(id, skillName, score, evaluations[skillName]?.notes || '');
+  };
+  
+  const handleNotesChange = (skillName, notes) => {
+    setEvaluations(prev => ({ ...prev, [skillName]: { ...prev[skillName], notes, lastUpdated: new Date().toISOString(), updatedBy: user?.fullName } }));
+    setDirtyFields(prev => new Set(prev).add(skillName));
+    debouncedSave(id, skillName, evaluations[skillName]?.score || 0, notes);
+  };
+  
+  const resetSkill = (skillName) => { if (confirm(`Resettare "${skillName}"?`)) { handleScoreChange(skillName, 0); handleNotesChange(skillName, ''); } };
+  const resetAll = () => { if (confirm('Resettare TUTTE le valutazioni?')) SKILLS.forEach(s => { handleScoreChange(s, 0); handleNotesChange(s, ''); }); };
+  
+  if (loading) return React.createElement('div', { className: 'loading-spinner' }, 'Caricamento...');
+  if (!student) return React.createElement('div', { className: 'loading-spinner' }, 'Allievo non trovato');
+  
+  return React.createElement('div', { className: 'evaluation-sheet' },
+    React.createElement('div', { className: 'sheet-header' },
+      React.createElement('button', { onClick: () => navigate('/students'), className: 'back-btn' }, '← Torna'),
+      React.createElement('h1', null, `${student.firstName} ${student.lastName}`),
+      React.createElement('div', { className: 'sheet-actions' },
+        React.createElement('button', { onClick: () => { setSaving(true); setTimeout(() => setSaving(false), 1000); }, disabled: saving, className: 'save-all-btn' }, '💾 Salva tutto'),
+        React.createElement('button', { onClick: resetAll, className: 'reset-all-btn' }, '↺ Reset tutto')
+      )
+    ),
+    React.createElement('div', { className: 'skills-container' }, SKILLS.map((skill, idx) =>
+      React.createElement(SkillRow, {
+        key: skill, skillName: skill, index: idx + 1,
+        score: evaluations[skill]?.score || 0,
+        notes: evaluations[skill]?.notes || '',
+        lastUpdated: evaluations[skill]?.lastUpdated,
+        updatedBy: evaluations[skill]?.updatedBy,
+        isDirty: dirtyFields.has(skill),
+        onScoreChange: (s) => handleScoreChange(skill, s),
+        onNotesChange: (n) => handleNotesChange(skill, n),
+        onReset: () => resetSkill(skill)
+      })
+    )),
+    lastSaved && React.createElement('div', { className: 'save-status' }, `Ultimo salvataggio: ${lastSaved.toLocaleTimeString()}${!isOnline ? ' (offline)' : ''}`)
+  );
+}
+
+// App Component
+function App() {
+  const { user, loading } = useAuth();
+  
+  if (loading) return React.createElement('div', { className: 'loading-spinner' }, 'Caricamento...');
+  
+  return React.createElement(ReactRouterDOM.BrowserRouter, null,
+    React.createElement(AuthProvider, null,
+      React.createElement(OfflineProvider, null,
+        React.createElement('div', null,
+          React.createElement(ConnectionStatus, null),
+          React.createElement(ReactRouterDOM.Routes, null,
+            React.createElement(ReactRouterDOM.Route, { path: "/login", element: React.createElement(LoginForm, null) }),
+            React.createElement(ReactRouterDOM.Route, { path: "/", element: React.createElement(ReactRouterDOM.Navigate, { to: "/students" }) }),
+            React.createElement(ReactRouterDOM.Route, { path: "/students", element: user ? React.createElement(StudentList, null) : React.createElement(ReactRouterDOM.Navigate, { to: "/login" }) }),
+            React.createElement(ReactRouterDOM.Route, { path: "/students/:id", element: user ? React.createElement(EvaluationSheet, null) : React.createElement(ReactRouterDOM.Navigate, { to: "/login" }) }),
+            React.createElement(ReactRouterDOM.Route, { path: "/change-password", element: user ? React.createElement(ChangePassword, null) : React.createElement(ReactRouterDOM.Navigate, { to: "/login" }) })
+          )
+        )
+      )
+    )
+  );
+}
+
+// Render App
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App, null));
+</script>
+</body>
+</html>
