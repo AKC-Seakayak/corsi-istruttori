@@ -14,7 +14,7 @@ const evaluationItems = [
     "Pagaiata indietro /europea",
     "Pagaiata circolare 360°",
     "Spostamento laterale a un tempo",
-    "spostamento laterale continuo",
+    "Spostamento laterale continuo",
     "Timonata di poppa",
     "Appoggio basso",
     "Trasporto kayak",
