@@ -4,6 +4,7 @@ let currentUserRole = null;
 let currentCourseId = null;
 let currentCourseName = null;
 let coursesList = [];
+let allUsersList = []; // per la gestione assegnazioni
 
 // Lista valutazioni (20 item)
 const evaluationItems = [
@@ -13,12 +14,12 @@ const evaluationItems = [
     "Pagaiata indietro /europea",
     "Pagaiata circolare 360°",
     "Spostamento laterale a un tempo",
-    "Spostamento laterale continuo",
+    "spostamento laterale continuo",
     "Timonata di poppa",
     "Appoggio basso",
     "Trasporto kayak",
     "Imbarco asciutto",
-    "imbarco alla cowboy",
+    "Imbarco alla cowboy",
     "Imbarco bilanciere",
     "Sbarco con bilanciere",
     "Sbarco cowboy",
@@ -48,6 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const backToStudentsBtn = document.getElementById('back-to-students-btn');
     const backFromAdminBtn = document.getElementById('back-from-admin-btn');
 
+    // Modale assegnazioni
+    const assignModal = document.getElementById('assign-modal');
+    const closeAssignModal = document.querySelector('.close-assign-modal');
+    const saveAssignmentsBtn = document.getElementById('save-assignments-btn');
+    let currentAssignCourse = null;
+
     // Stato autenticazione
     window.onAuthStateChanged(window.auth, async (user) => {
         if (user) {
@@ -73,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (adminBtn) adminBtn.style.display = currentUserRole === 'admin' ? 'inline-block' : 'none';
             if (addCourseBtn) addCourseBtn.style.display = currentUserRole === 'admin' ? 'inline-block' : 'none';
 
-            // Carica corsi
+            // Carica corsi (con filtro automatico in base al ruolo)
             await loadCourses();
             showCoursesView();
         } else {
@@ -110,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const messageDiv = document.getElementById('auth-message');
         try {
             const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
-            // Crea documento utente
             await window.setDoc(window.doc(window.db, "users", userCredential.user.uid), {
                 email: email,
                 role: "user",
@@ -130,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await window.signOut(window.auth);
     });
 
-    // Cambio password
+    // Cambio password (uguale a prima)
     changePwdBtn.addEventListener('click', () => {
         passwordModal.style.display = 'flex';
         document.getElementById('current-password').value = '';
@@ -174,16 +180,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Gestione corsi
+    // Creazione corso (solo admin)
     addCourseBtn.addEventListener('click', async () => {
-        const courseName = prompt('Nome del corso (es. Corso Istruttori Base Minusio):');
+        const courseName = prompt('Nome del corso:');
         if (!courseName) return;
         const description = prompt('Descrizione (opzionale):');
         await window.addDoc(window.collection(window.db, "courses"), {
             name: courseName,
             description: description || '',
             createdAt: new Date().toISOString(),
-            createdBy: currentUser.uid
+            createdBy: currentUser.uid,
+            assignedUserIds: []   // inizialmente nessun utente assegnato
         });
         await loadCourses();
         showMessage('Corso creato', 'success');
@@ -210,21 +217,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Pulsante admin
+    // Admin: gestione utenti (ruoli)
     adminBtn.addEventListener('click', showAdminView);
     backFromAdminBtn.addEventListener('click', () => {
         showCoursesView();
         loadCourses();
     });
 
-    // ------------------- FUNZIONI -------------------
+    // Gestione modale assegnazioni
+    closeAssignModal.addEventListener('click', () => {
+        assignModal.style.display = 'none';
+    });
+
+    saveAssignmentsBtn.addEventListener('click', async () => {
+        if (!currentAssignCourse) return;
+        const checkboxes = document.querySelectorAll('#assign-users-list input[type="checkbox"]');
+        const selectedUserIds = Array.from(checkboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+        
+        try {
+            await window.updateDoc(window.doc(window.db, "courses", currentAssignCourse.id), {
+                assignedUserIds: selectedUserIds
+            });
+            document.getElementById('assign-message').textContent = 'Assegnazioni salvate!';
+            document.getElementById('assign-message').className = 'message success';
+            setTimeout(() => {
+                assignModal.style.display = 'none';
+                loadCourses(); // ricarica i corsi
+            }, 1000);
+        } catch (error) {
+            document.getElementById('assign-message').textContent = 'Errore: ' + error.message;
+            document.getElementById('assign-message').className = 'message error';
+        }
+    });
+
+    // ------------------- FUNZIONI PRINCIPALI -------------------
 
     async function loadCourses() {
         try {
             const querySnapshot = await window.getDocs(window.collection(window.db, "courses"));
             coursesList = [];
             querySnapshot.forEach(doc => {
-                coursesList.push({ id: doc.id, ...doc.data() });
+                const data = doc.data();
+                // Filtro lato client (per sicurezza, le regole già filtrano)
+                if (currentUserRole === 'admin' || (data.assignedUserIds && data.assignedUserIds.includes(currentUser.uid))) {
+                    coursesList.push({ id: doc.id, ...data });
+                }
             });
             renderCoursesList();
         } catch (error) {
@@ -237,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('courses-grid');
         if (!grid) return;
         if (coursesList.length === 0) {
-            grid.innerHTML = '<div class="card">Nessun corso presente. Clicca su "+ Nuovo Corso" per iniziare.</div>';
+            grid.innerHTML = '<div class="card">Nessun corso disponibile.</div>';
             return;
         }
         grid.innerHTML = '';
@@ -249,12 +288,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>${escapeHtml(course.description || '')}</p>
                 <div class="actions">
                     <button class="btn small view-course" data-id="${course.id}">Apri Corso</button>
-                    ${currentUserRole === 'admin' ? `<button class="btn small danger delete-course" data-id="${course.id}">Elimina Corso</button>` : ''}
+                    ${currentUserRole === 'admin' ? `
+                        <button class="btn small secondary assign-users" data-id="${course.id}" data-name="${escapeHtml(course.name)}">👥 Assegna Utenti</button>
+                        <button class="btn small danger delete-course" data-id="${course.id}">Elimina</button>
+                    ` : ''}
                 </div>
             `;
             grid.appendChild(card);
         });
 
+        // Apri corso
         document.querySelectorAll('.view-course').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = btn.getAttribute('data-id');
@@ -264,11 +307,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (currentUserRole === 'admin') {
+            // Assegna utenti
+            document.querySelectorAll('.assign-users').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = btn.getAttribute('data-id');
+                    const name = btn.getAttribute('data-name');
+                    const course = coursesList.find(c => c.id === id);
+                    if (course) await showAssignUsersModal(course);
+                });
+            });
+            // Elimina corso
             document.querySelectorAll('.delete-course').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     const id = btn.getAttribute('data-id');
-                    if (confirm('Eliminare il corso? Verranno eliminati anche tutti gli allievi associati.')) {
-                        // Elimina tutti gli allievi con questo courseId
+                    if (confirm('Eliminare il corso? Tutti gli allievi associati verranno eliminati.')) {
                         const studentsSnap = await window.getDocs(window.collection(window.db, "students"));
                         const toDelete = [];
                         studentsSnap.forEach(doc => {
@@ -284,6 +336,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         }
+    }
+
+    async function showAssignUsersModal(course) {
+        currentAssignCourse = course;
+        // Carica tutti gli utenti
+        const usersSnap = await window.getDocs(window.collection(window.db, "users"));
+        allUsersList = [];
+        usersSnap.forEach(doc => allUsersList.push({ id: doc.id, ...doc.data() }));
+        
+        const container = document.getElementById('assign-users-list');
+        container.innerHTML = '';
+        allUsersList.forEach(user => {
+            const isChecked = course.assignedUserIds && course.assignedUserIds.includes(user.uid);
+            const div = document.createElement('div');
+            div.style.margin = '8px 0';
+            div.innerHTML = `
+                <label>
+                    <input type="checkbox" value="${user.uid}" ${isChecked ? 'checked' : ''}>
+                    ${escapeHtml(user.email)} (${user.role})
+                </label>
+            `;
+            container.appendChild(div);
+        });
+        document.getElementById('assign-course-name').textContent = course.name;
+        document.getElementById('assign-message').textContent = '';
+        assignModal.style.display = 'flex';
     }
 
     async function showCourseStudents(course) {
@@ -468,7 +546,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     await window.addDoc(window.collection(window.db, "students"), studentData);
                     showMessage('Allievo creato', 'success');
                 }
-                // Torna alla lista allievi del corso
                 showCourseStudents({ id: currentCourseId, name: currentCourseName });
             } catch (error) {
                 console.error(error);
