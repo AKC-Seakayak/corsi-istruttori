@@ -40,7 +40,7 @@ const evaluationItemsLevel2 = [
     "Appoggio alto continuo",
     "Rolling dx",
     "Rolling sx",
-    "Train di contatto",
+    "Traino di contatto",
     "Traino con cima"
 ];
 
