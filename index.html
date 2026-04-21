@@ -80,18 +80,29 @@ const firebaseConfig = {
             </div>
         </header>
 
-        <div id="student-list-view">
-            <div class="toolbar">
-                <button id="add-student-btn" class="btn primary">+ Nuovo Allievo</button>
-            </div>
-            <div id="students-grid" class="students-grid"></div>
-        </div>
-
-        <div id="student-edit-view" style="display: none;">
-            <button id="back-to-list-btn" class="btn secondary">← Torna alla lista</button>
-            <div id="student-form-container"></div>
-        </div>
+        <!-- VISTA CORSI (principale) -->
+<div id="courses-view">
+    <div class="toolbar">
+        <button id="add-course-btn" class="btn primary" style="display: none;">+ Nuovo Corso</button>
     </div>
+    <div id="courses-grid" class="students-grid"></div>
+</div>
+
+<!-- VISTA ALLIEVI DI UN CORSO (sostituisce la vecchia student-list-view) -->
+<div id="course-students-view" style="display: none;">
+    <button id="back-to-courses-btn" class="btn secondary">← Torna ai Corsi</button>
+    <h2 id="course-title"></h2>
+    <div class="toolbar">
+        <button id="add-student-to-course-btn" class="btn primary">+ Nuovo Allievo</button>
+    </div>
+    <div id="students-by-course-grid" class="students-grid"></div>
+</div>
+
+<!-- VISTA MODIFICA ALLIEVO (uguale a prima) -->
+<div id="student-edit-view" style="display: none;">
+    <button id="back-to-students-btn" class="btn secondary">← Torna agli Allievi</button>
+    <div id="student-form-container"></div>
+</div>
 
     <!-- Modal Cambio Password -->
     <div id="password-modal" class="modal" style="display: none;">
