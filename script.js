@@ -25,7 +25,8 @@ const evaluationItemsLevel1 = [
     "Sbarco cowboy",
     "Uscita bagnata",
     "Autosalvataggio Cowboy",
-    "Autosalvataggio con paddlefloat, Rescue T",
+    "Autosalvataggio con paddlefloat", 
+    "Rescue T",
     "Inclinazione dello scafo con equilibrio",
     "Inclinazione dello scafo con perdita di equilibrio"
 ];
