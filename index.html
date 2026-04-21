@@ -126,6 +126,27 @@
             <div id="password-message" class="message"></div>
         </div>
     </div>
+    // Sostituisci la funzione addCourseBtn
+addCourseBtn.addEventListener('click', async () => {
+    const courseName = prompt('Nome del corso:');
+    if (!courseName) return;
+    const level = prompt('Livello del corso (1 = Base, 2 = Avanzato):', '1');
+    if (level !== '1' && level !== '2') {
+        alert('Livello non valido. Inserisci 1 o 2.');
+        return;
+    }
+    const description = prompt('Descrizione (opzionale):');
+    await window.addDoc(window.collection(window.db, "courses"), {
+        name: courseName,
+        description: description || '',
+        level: parseInt(level),
+        createdAt: new Date().toISOString(),
+        createdBy: currentUser.uid,
+        assignedUserIds: []
+    });
+    await loadCourses();
+    showMessage('Corso creato', 'success');
+});
     <!-- Modal Gestione Assegnazioni Utenti a Corso (solo admin) -->
 <div id="assign-modal" class="modal" style="display: none;">
     <div class="modal-content">
