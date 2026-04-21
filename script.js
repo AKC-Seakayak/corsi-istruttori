@@ -16,7 +16,7 @@ const evaluationItems = [
     "Appoggio basso",
     "Trasporto kayak",
     "Imbarco asciutto",
-    "imbarco alla cowboy",
+    "Imbarco alla cowboy",
     "Imbarco bilanciere",
     "Sbarco con bilanciere",
     "Sbarco cowboy",
