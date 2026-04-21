@@ -11,20 +11,20 @@ const evaluationItems = [
     "Pagaiata indietro /europea",
     "Pagaiata circolare 360°",
     "Spostamento laterale a un tempo",
-    "spostamento laterale continuo",
-    "limonata di poppa",
+    "Spostamento laterale continuo",
+    "Timonata di poppa",
     "Appoggio basso",
-    "trasporto kayak",
+    "Trasporto kayak",
     "Imbarco asciutto",
     "imbarco alla cowboy",
-    "imbarco bilanciere",
-    "sbarco con bilanciere",
-    "sbarco cowboy",
+    "Imbarco bilanciere",
+    "Sbarco con bilanciere",
+    "Sbarco cowboy",
     "Uscita bagnata",
     "Autosalvataggio Cowboy",
-    "autosalvataggio con paddlefloat, Rescue T",
-    "inclinazione dello scafo con equilibrio",
-    "inclinazione dello scafo con perdita di equilibrio"
+    "Autosalvataggio con paddlefloat, Rescue T",
+    "Inclinazione dello scafo con equilibrio",
+    "Inclinazione dello scafo con perdita di equilibrio"
 ];
 
 // Inizializzazione
