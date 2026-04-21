@@ -14,10 +14,10 @@ const evaluationItemsLevel1 = [
     "Pagaiata indietro /europea",
     "Pagaiata circolare 360°",
     "Spostamento laterale a un tempo",
-    "spostamento laterale continuo",
+    "Spostamento laterale continuo",
     "Timonata di poppa",
     "Appoggio basso",
-    "trasporto kayak",
+    "Trasporto kayak",
     "Imbarco asciutto",
     "Imbarco alla cowboy",
     "Imbarco bilanciere",
@@ -25,7 +25,7 @@ const evaluationItemsLevel1 = [
     "Sbarco cowboy",
     "Uscita bagnata",
     "Autosalvataggio Cowboy",
-    "autosalvataggio con paddlefloat, Rescue T",
+    "Autosalvataggio con paddlefloat, Rescue T",
     "Inclinazione dello scafo con equilibrio",
     "Inclinazione dello scafo con perdita di equilibrio"
 ];
@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveAssignmentsBtn = document.getElementById('save-assignments-btn');
     let currentAssignCourse = null;
 
+    // Stato autenticazione
     window.onAuthStateChanged(window.auth, async (user) => {
         if (user) {
             currentUser = user;
@@ -76,28 +77,28 @@ document.addEventListener('DOMContentLoaded', () => {
             appContainer.style.display = 'block';
             userEmailSpan.textContent = user.email;
 
-let userDoc = await window.getDoc(window.doc(window.db, "users", user.uid));
-if (!userDoc.exists()) {
-    try {
-        await window.setDoc(window.doc(window.db, "users", user.uid), {
-            email: user.email,
-            role: "user",
-            uid: userCredential.user.uid
-        });
-        console.log("Documento utente creato per", user.email);
-    } catch (error) {
-        console.error("Errore creazione documento utente:", error);
-        // Se fallisce (es. regole troppo strette), almeno impostiamo un ruolo di default per la sessione
-        currentUserRole = "user";
-    }
-    userDoc = await window.getDoc(window.doc(window.db, "users", user.uid));
-}
-if (userDoc.exists()) {
-    currentUserRole = userDoc.data().role;
-} else {
-    currentUserRole = "user"; // fallback
-}
+            // Crea automaticamente il documento utente in Firestore se non esiste
+            let userDoc = await window.getDoc(window.doc(window.db, "users", user.uid));
+            if (!userDoc.exists()) {
+                try {
+                    await window.setDoc(window.doc(window.db, "users", user.uid), {
+                        email: user.email,
+                        role: "user",
+                        uid: user.uid
+                    });
+                    console.log("Documento utente creato per", user.email);
+                    userDoc = await window.getDoc(window.doc(window.db, "users", user.uid));
+                } catch (error) {
+                    console.error("Errore creazione documento utente:", error);
+                }
+            }
+            if (userDoc.exists()) {
+                currentUserRole = userDoc.data().role;
+            } else {
+                currentUserRole = "user"; // fallback
+            }
 
+            // Mostra pulsanti admin solo se ruolo = admin
             if (adminBtn) adminBtn.style.display = currentUserRole === 'admin' ? 'inline-block' : 'none';
             if (addCourseBtn) addCourseBtn.style.display = currentUserRole === 'admin' ? 'inline-block' : 'none';
 
@@ -114,6 +115,7 @@ if (userDoc.exists()) {
         }
     });
 
+    // Login
     loginBtn.addEventListener('click', async () => {
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
@@ -129,12 +131,14 @@ if (userDoc.exists()) {
         }
     });
 
+    // Registrazione
     registerBtn.addEventListener('click', async () => {
         const email = document.getElementById('register-email').value;
         const password = document.getElementById('register-password').value;
         const messageDiv = document.getElementById('auth-message');
         try {
             const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
+            // Crea documento utente subito dopo la registrazione
             await window.setDoc(window.doc(window.db, "users", userCredential.user.uid), {
                 email: email,
                 role: "user",
@@ -149,10 +153,12 @@ if (userDoc.exists()) {
         }
     });
 
+    // Logout
     logoutBtn.addEventListener('click', async () => {
         await window.signOut(window.auth);
     });
 
+    // Cambio password
     changePwdBtn.addEventListener('click', () => {
         passwordModal.style.display = 'flex';
         document.getElementById('current-password').value = '';
@@ -196,7 +202,7 @@ if (userDoc.exists()) {
         }
     });
 
-    // Creazione corso con scelta livello
+    // Creazione corso con scelta livello (solo admin)
     addCourseBtn.addEventListener('click', async () => {
         const courseName = prompt('Nome del corso:');
         if (!courseName) return;
@@ -269,7 +275,7 @@ if (userDoc.exists()) {
         }
     });
 
-    // ------------------- FUNZIONI -------------------
+    // ------------------- FUNZIONI PRINCIPALI -------------------
 
     async function loadCourses() {
         try {
@@ -277,28 +283,36 @@ if (userDoc.exists()) {
             coursesList = [];
             querySnapshot.forEach(doc => {
                 const data = doc.data();
-                // Default livello 1 per vecchi corsi
                 if (!data.level) data.level = 1;
-                if (currentUserRole === 'admin' || (data.assignedUserIds && data.assignedUserIds.includes(currentUser.uid))) {
-                    coursesList.push({ id: doc.id, ...data });
-                }
+                if (!data.assignedUserIds) data.assignedUserIds = [];
+                coursesList.push({ id: doc.id, ...data });
             });
             renderCoursesList();
         } catch (error) {
-            console.error(error);
-            showMessage('Errore caricamento corsi', 'error');
+            console.error("Errore caricamento corsi:", error);
+            showMessage("Errore caricamento corsi", "error");
         }
     }
 
     function renderCoursesList() {
         const grid = document.getElementById('courses-grid');
         if (!grid) return;
-        if (coursesList.length === 0) {
-            grid.innerHTML = '<div class="card">Nessun corso disponibile.</div>';
+        
+        // Filtra corsi in base al ruolo e assegnazioni
+        let visibleCourses = coursesList;
+        if (currentUserRole !== 'admin') {
+            visibleCourses = coursesList.filter(course => 
+                course.assignedUserIds && course.assignedUserIds.includes(currentUser.uid)
+            );
+        }
+        
+        if (visibleCourses.length === 0) {
+            grid.innerHTML = '<div class="card">Nessun corso disponibile per il tuo account.</div>';
             return;
         }
+        
         grid.innerHTML = '';
-        coursesList.forEach(course => {
+        visibleCourses.forEach(course => {
             const levelLabel = course.level === 1 ? '🏅 Base' : '⭐ Avanzato';
             const card = document.createElement('div');
             card.className = 'student-card';
@@ -316,10 +330,11 @@ if (userDoc.exists()) {
             grid.appendChild(card);
         });
 
+        // Eventi pulsanti
         document.querySelectorAll('.view-course').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = btn.getAttribute('data-id');
-                const course = coursesList.find(c => c.id === id);
+                const course = visibleCourses.find(c => c.id === id);
                 if (course) showCourseStudents(course);
             });
         });
@@ -329,7 +344,7 @@ if (userDoc.exists()) {
                 btn.addEventListener('click', async (e) => {
                     const id = btn.getAttribute('data-id');
                     const name = btn.getAttribute('data-name');
-                    const course = coursesList.find(c => c.id === id);
+                    const course = visibleCourses.find(c => c.id === id);
                     if (course) await showAssignUsersModal(course);
                 });
             });
@@ -356,6 +371,7 @@ if (userDoc.exists()) {
 
     async function showAssignUsersModal(course) {
         currentAssignCourse = course;
+        // Carica tutti gli utenti (admin e user)
         const usersSnap = await window.getDocs(window.collection(window.db, "users"));
         allUsersList = [];
         usersSnap.forEach(doc => allUsersList.push({ id: doc.id, ...doc.data() }));
@@ -452,7 +468,7 @@ if (userDoc.exists()) {
         
         const container = document.getElementById('student-form-container');
         
-        // Determina il corso corrente e il suo livello
+        // Ottieni il corso corrente e le sue abilità
         const course = coursesList.find(c => c.id === currentCourseId);
         const evaluationItems = course?.level === 2 ? evaluationItemsLevel2 : evaluationItemsLevel1;
         
@@ -568,7 +584,7 @@ if (userDoc.exists()) {
                 showCourseStudents({ id: currentCourseId, name: currentCourseName });
             } catch (error) {
                 console.error(error);
-                alert('Errore: ' + error.message);
+                alert('Errore nel salvataggio: ' + error.message);
             }
         });
         
