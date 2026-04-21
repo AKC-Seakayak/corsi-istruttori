@@ -12,14 +12,15 @@
         import { getFirestore, collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         
         // 🔁 SOSTITUISCI CON I TUOI DATI FIREBASE (presi dalla console Firebase)
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+        // Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDYE2PQiqYn5INBInSI5mCr_xhffHR3bQU",
+  authDomain: "seatrainer-457de.firebaseapp.com",
+  projectId: "seatrainer-457de",
+  storageBucket: "seatrainer-457de.firebasestorage.app",
+  messagingSenderId: "869282330869",
+  appId: "1:869282330869:web:bd1fd6822cb770d87badbc"
+};
         
         // Inizializza Firebase
         const app = initializeApp(firebaseConfig);
