@@ -23,7 +23,7 @@ body {
     margin-bottom: 20px;
 }
 .logo-large img {
-    max-width: 120px;  /* aumenta se vuoi più grande */
+    max-width: 160px;  /* aumenta se vuoi più grande */
     height: auto;
     /* rimuovo sfondo, padding e border-radius per avere immagine trasparente */
     background: none;
