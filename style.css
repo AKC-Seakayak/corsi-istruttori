@@ -1,0 +1,400 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+    background: white;
+    color: #1e2a3e;
+    line-height: 1.5;
+    padding: 24px 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Logo grande sopra la barra - scontornato */
+.logo-large {
+    text-align: left;
+    margin-bottom: 20px;
+}
+.logo-large img {
+    max-width: 120px;  /* aumenta se vuoi più grande */
+    height: auto;
+    /* rimuovo sfondo, padding e border-radius per avere immagine trasparente */
+    background: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+/* Header (barra superiore) */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    background: white;
+    padding: 16px 0;
+    margin-bottom: 32px;
+    border-bottom: 1px solid #eaeef2;
+}
+.header-left h1 {
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: #1e2a3e;
+    margin: 0;
+}
+.user-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Card generiche */
+.card {
+    background: white;
+    border: 1px solid #eaeef2;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+.auth-card {
+    max-width: 550px;
+    margin: 40px auto;
+    text-align: center;
+}
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.logo {
+    max-width: 80px;
+    height: auto;
+    margin-bottom: 10px;
+    /* scontornato anche nella login */
+    background: none;
+    border-radius: 0;
+    padding: 0;
+}
+.logo-text {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #5b6e8c;
+    text-align: center;
+}
+
+/* Pulsanti */
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    background: white;
+    border-color: #e2e8f0;
+    color: #1e2a3e;
+}
+.btn.primary {
+    background: #1e2a3e;
+    border-color: #1e2a3e;
+    color: white;
+}
+.btn.primary:hover {
+    background: #2d3a4e;
+}
+.btn.secondary {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #1e2a3e;
+}
+.btn.secondary:hover {
+    background: #e2e8f0;
+}
+.btn.danger {
+    background: white;
+    border-color: #e2e8f0;
+    color: #b91c1c;
+}
+.btn.danger:hover {
+    background: #fee2e2;
+}
+.btn.small {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+}
+.btn:active {
+    transform: scale(0.98);
+}
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+/* Griglia corsi / allievi */
+.students-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+.student-card {
+    background: white;
+    border: 1px solid #eaeef2;
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.2s;
+}
+.student-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+.student-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    color: #1e2a3e;
+}
+.student-card p {
+    color: #5b6e8c;
+    font-size: 0.85rem;
+    margin: 6px 0;
+}
+.student-card .actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+/* Tabelle valutazioni */
+.evaluation-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    margin: 20px 0;
+}
+.evaluation-table th,
+.evaluation-table td {
+    border-bottom: 1px solid #eaeef2;
+    padding: 12px 10px;
+    text-align: left;
+    vertical-align: top;
+}
+.evaluation-table th {
+    background: #fafafa;
+    font-weight: 600;
+    color: #1e2a3e;
+}
+.evaluation-table input[type="number"] {
+    width: 80px;
+    padding: 6px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+.evaluation-table textarea {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.8rem;
+}
+.note-cell {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+.delete-note-btn {
+    background: #f1f5f9;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    color: #5b6e8c;
+}
+.delete-note-btn:hover {
+    background: #e2e8f0;
+}
+
+/* Form */
+.form-section {
+    background: white;
+    border: 1px solid #eaeef2;
+    border-radius: 20px;
+    padding: 28px;
+    margin-top: 24px;
+}
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.form-row .field {
+    flex: 1;
+    min-width: 200px;
+}
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+}
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #5b6e8c;
+}
+/* Checkbox allineati correttamente */
+.checkbox-group {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+.checkbox-group label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: normal;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    transform: scale(1.1);
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal-content {
+    background: white;
+    border-radius: 24px;
+    padding: 28px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+.close-modal, .close-assign-modal {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-size: 26px;
+    cursor: pointer;
+    color: #94a3b8;
+}
+.close-modal:hover, .close-assign-modal:hover {
+    color: #1e2a3e;
+}
+.message {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+}
+.error {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+.success {
+    background: #dcfce7;
+    color: #15803d;
+}
+h1, h2, h3 {
+    color: #1e2a3e;
+    font-weight: 500;
+}
+h2 {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+}
+h3 {
+    font-size: 1.1rem;
+    margin: 20px 0 12px 0;
+}
+
+/* Stampa */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+    }
+    .container {
+        max-width: 100%;
+    }
+    header, .toolbar, .btn, .user-bar, .actions, .modal, .close-modal,
+    #back-to-courses-btn, #back-to-students-btn, #back-from-admin-btn,
+    #add-student-to-course-btn, #print-course-btn, #admin-btn,
+    #change-password-btn, #logout-btn, .delete-note-btn,
+    .logo-large, .logo-container {
+        display: none !important;
+    }
+    .student-card {
+        break-inside: avoid;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+    }
+    .evaluation-table th, .evaluation-table td {
+        border: 1px solid #ccc;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .evaluation-table, .evaluation-table thead, .evaluation-table tbody, 
+    .evaluation-table tr, .evaluation-table td {
+        display: block;
+    }
+    .evaluation-table tr {
+        margin-bottom: 16px;
+        border: 1px solid #eaeef2;
+    }
+    .evaluation-table td {
+        border: none;
+        position: relative;
+        padding-left: 45%;
+    }
+    .evaluation-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 12px;
+        width: 40%;
+        font-weight: 600;
+    }
+    .checkbox-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
