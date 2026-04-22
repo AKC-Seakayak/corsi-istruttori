@@ -22,7 +22,7 @@ body {
     margin-bottom: 24px;
 }
 .logo-large img {
-    max-width: 100px;
+    max-width: 200px;
     height: auto;
     display: block;
 }
@@ -266,7 +266,7 @@ input:focus, select:focus, textarea:focus {
     margin-bottom: 24px;
 }
 .logo {
-    max-width: 80px;
+    max-width: 200px;
     margin-bottom: 12px;
 }
 .logo-text {
