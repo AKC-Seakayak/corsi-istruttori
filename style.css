@@ -475,3 +475,34 @@ h3 {
         gap: 12px !important;
     }
 }
+/* Forza visibilità checkbox su mobile - override di eventuali regole conflittuali */
+@media (max-width: 768px) {
+    .checkbox-group,
+    .checkbox-group * {
+        display: revert !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+    .checkbox-group {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        margin: 20px 0 !important;
+        padding: 10px !important;
+        background: transparent !important;
+    }
+    .checkbox-group label {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+    .checkbox-group input[type="checkbox"] {
+        width: 20px !important;
+        height: 20px !important;
+        transform: none !important;
+        margin: 0 !important;
+    }
+}
