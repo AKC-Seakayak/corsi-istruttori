@@ -444,3 +444,34 @@ h3 {
         gap: 12px;
     }
 }
+/* Forza la visibilità delle checkbox su tutti i dispositivi */
+.checkbox-group {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 20px !important;
+    align-items: center !important;
+    margin: 20px 0 !important;
+    padding: 10px 0 !important;
+}
+.checkbox-group label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 0.9rem !important;
+}
+.checkbox-group input[type="checkbox"] {
+    width: 20px !important;
+    height: 20px !important;
+    margin: 0 !important;
+    transform: none !important;
+    flex-shrink: 0 !important;
+    accent-color: #1e2a3e !important;
+}
+@media (max-width: 768px) {
+    .checkbox-group {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+}
