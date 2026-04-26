@@ -45,7 +45,7 @@ body {
     margin-bottom: 24px;
 }
 .logo-large img {
-    max-width: 100px;
+    max-width: 200px;
     height: auto;
     transition: opacity 0.2s;
 }
