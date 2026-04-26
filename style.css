@@ -170,7 +170,6 @@ header {
     margin-top: 16px;
 }
 
-/* Tabella base (desktop) */
 .evaluation-table {
     width: 100%;
     border-collapse: collapse;
@@ -231,7 +230,7 @@ header {
     transition: max-height 0.3s ease-out;
 }
 .accordion-content.open {
-    max-height: 2000px;
+    max-height: none;      /* 🔁 NESSUN LIMITE - VISIBILITÀ COMPLETA */
     padding: 18px;
 }
 
@@ -410,7 +409,6 @@ h3 {
 
 /* ========== RESPONSIVE MOBILE: BLOCCHI VERTICALI ========== */
 @media (max-width: 768px) {
-    /* Disattiva il layout tabellare */
     .evaluation-table,
     .evaluation-table thead,
     .evaluation-table tbody,
@@ -419,11 +417,9 @@ h3 {
     .evaluation-table th {
         display: block;
     }
-    /* Nasconde l'intestazione (le colonne non servono più) */
     .evaluation-table thead {
         display: none;
     }
-    /* Ogni riga = blocco */
     .evaluation-table tr {
         border: 1px solid #eaeef2;
         border-radius: 16px;
@@ -431,7 +427,6 @@ h3 {
         padding: 16px;
         background: white;
     }
-    /* Ogni cella impilata */
     .evaluation-table td {
         display: block;
         width: 100%;
@@ -439,7 +434,6 @@ h3 {
         border: none;
         text-align: left;
     }
-    /* Abilità in grassetto con bordo sotto */
     .evaluation-table td:first-child {
         font-weight: 700;
         font-size: 1rem;
@@ -447,13 +441,11 @@ h3 {
         padding-bottom: 8px;
         border-bottom: 1px solid #eaeef2;
     }
-    /* Select valutazione: larghezza piena */
     .evaluation-select {
         width: 100%;
         min-width: auto;
         margin-bottom: 8px;
     }
-    /* Note: textarea larga, bottone sotto o a lato? Lasciamo flessibile */
     .note-cell {
         flex-direction: column;
         align-items: stretch;
@@ -467,13 +459,11 @@ h3 {
         align-self: flex-start;
         margin-top: 0;
     }
-    /* Checkbox certificati in colonna */
     .checkbox-group {
         flex-direction: column;
         align-items: flex-start;
         gap: 12px;
     }
-    /* Riduce padding generale per spazio */
     body, .container, .form-section, .card {
         padding-left: 12px;
         padding-right: 12px;
