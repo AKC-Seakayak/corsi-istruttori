@@ -1,0 +1,517 @@
+/* ============================================
+   VARIABILI E RESET
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #0f4c81;
+    --primary-light: #2c6e9e;
+    --primary-dark: #0a3a60;
+    --gray-bg: #f5f7fa;
+    --gray-border: #e2e8f0;
+    --text-dark: #1e2a3e;
+    --text-muted: #5b6e8c;
+    --white: #ffffff;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --radius-card: 20px;
+    --radius-btn: 40px;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--gray-bg);
+    color: var(--text-dark);
+    line-height: 1.5;
+    padding: 24px 20px;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   LOGO E HEADER
+   ============================================ */
+.logo-large {
+    text-align: left;
+    margin-bottom: 20px;
+}
+.logo-large img {
+    max-width: 100px;
+    height: auto;
+    background: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    background: var(--white);
+    padding: 16px 24px;
+    border-radius: var(--radius-card);
+    margin-bottom: 32px;
+    box-shadow: var(--shadow-sm);
+}
+.header-left h1 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 0;
+}
+.user-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Card generiche */
+.card {
+    background: var(--white);
+    border-radius: var(--radius-card);
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+}
+.auth-card {
+    max-width: 500px;
+    margin: 40px auto;
+    text-align: center;
+}
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.logo {
+    max-width: 200px;   /* Logo più grande sulla login */
+    height: auto;
+    margin-bottom: 16px;
+}
+.logo-text {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* Pulsanti */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: var(--radius-btn);
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    font-family: inherit;
+}
+.btn.primary {
+    background: var(--primary);
+    color: white;
+}
+.btn.primary:hover {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+}
+.btn.secondary {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    color: var(--text-dark);
+}
+.btn.secondary:hover {
+    background: #f8fafc;
+}
+.btn.danger {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    color: #b91c1c;
+}
+.btn.danger:hover {
+    background: #fee2e2;
+}
+.btn.small {
+    padding: 6px 14px;
+    font-size: 0.75rem;
+}
+.btn:active {
+    transform: scale(0.97);
+}
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+/* Griglia corsi / allievi con rientro a sinistra */
+.students-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-left: 12px;   /* RIENTRO A SINISTRA */
+}
+.student-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 20px;
+    transition: all 0.2s;
+    box-shadow: var(--shadow-sm);
+}
+.student-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+.student-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    color: var(--primary);
+}
+.student-card p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 6px 0;
+}
+.student-card .actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+/* Tabelle valutazioni */
+.evaluation-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    margin: 20px 0;
+}
+.evaluation-table th,
+.evaluation-table td {
+    border-bottom: 1px solid var(--gray-border);
+    padding: 14px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+.evaluation-table th {
+    background: #fafcff;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.evaluation-select {
+    width: auto;
+    min-width: 150px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--gray-border);
+    background: var(--white);
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* Accordion */
+.accordion-section {
+    margin-bottom: 24px;
+    border: 1px solid var(--gray-border);
+    border-radius: 20px;
+    background: var(--white);
+    overflow: hidden;
+}
+.accordion-header {
+    background: #fafcff;
+    padding: 16px 20px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid transparent;
+}
+.accordion-header:hover {
+    background: #f0f4f9;
+}
+.accordion-header.open {
+    border-bottom-color: var(--gray-border);
+}
+.accordion-content {
+    padding: 0 20px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+.accordion-content.open {
+    max-height: none;   /* NESSUN LIMITE */
+    padding: 20px;
+}
+
+.single-evaluation {
+    background: #fafcff;
+    padding: 20px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+.giudizio-finale {
+    margin-top: 0;
+}
+
+.note-cell {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 6px;
+}
+.delete-note-btn {
+    background: #f1f5f9;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    transition: background 0.2s;
+}
+.delete-note-btn:hover {
+    background: #e2e8f0;
+}
+
+/* Form */
+.form-section {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 32px;
+    margin-top: 28px;
+    box-shadow: var(--shadow-sm);
+}
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+.form-row .field {
+    flex: 1;
+    min-width: 200px;
+}
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+}
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--gray-border);
+    border-radius: 14px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border 0.2s;
+}
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 2px rgba(15, 76, 129, 0.1);
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 28px;
+    align-items: center;
+    margin: 24px 0;
+}
+.checkbox-group label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: normal;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+.checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    accent-color: var(--primary);
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.modal-content {
+    background: var(--white);
+    border-radius: 32px;
+    padding: 32px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+.close-modal, .close-assign-modal {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+.close-modal:hover, .close-assign-modal:hover {
+    color: var(--text-dark);
+}
+.message {
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 14px;
+    font-size: 0.85rem;
+}
+.error {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+.success {
+    background: #dcfce7;
+    color: #15803d;
+}
+h1, h2, h3 {
+    color: var(--primary-dark);
+    font-weight: 500;
+}
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+h3 {
+    font-size: 1.2rem;
+    margin: 24px 0 16px 0;
+}
+
+/* Stampa */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+    }
+    .container {
+        max-width: 100%;
+    }
+    header, .toolbar, .btn, .user-bar, .actions, .modal, .close-modal,
+    #back-to-courses-btn, #back-to-students-btn, #back-from-admin-btn,
+    #add-student-to-course-btn, #print-course-btn, #admin-btn,
+    #change-password-btn, #logout-btn, .delete-note-btn,
+    .logo-large, .logo-container {
+        display: none !important;
+    }
+    .student-card {
+        break-inside: avoid;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+        box-shadow: none;
+    }
+    .evaluation-table th, .evaluation-table td {
+        border: 1px solid #ccc;
+    }
+}
+
+/* ============================================
+   RESPONSIVE MOBILE (con rientro sinistra e notch)
+   ============================================ */
+@media (max-width: 768px) {
+    body {
+        padding: 16px 16px;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+    .students-grid {
+        margin-left: 8px;   /* rientro ridotto ma presente */
+        gap: 16px;
+    }
+    .evaluation-table,
+    .evaluation-table thead,
+    .evaluation-table tbody,
+    .evaluation-table tr,
+    .evaluation-table td,
+    .evaluation-table th {
+        display: block;
+    }
+    .evaluation-table thead {
+        display: none;
+    }
+    .evaluation-table tr {
+        border: 1px solid var(--gray-border);
+        border-radius: 20px;
+        margin-bottom: 20px;
+        padding: 16px;
+        background: var(--white);
+    }
+    .evaluation-table td {
+        display: block;
+        width: 100%;
+        padding: 8px 0;
+        border: none;
+        text-align: left;
+    }
+    .evaluation-table td:first-child {
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--gray-border);
+    }
+    .evaluation-select {
+        width: 100%;
+        min-width: auto;
+        margin: 8px 0;
+    }
+    .note-cell {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    .note-cell textarea {
+        width: 100%;
+    }
+    .delete-note-btn {
+        align-self: flex-start;
+    }
+    .checkbox-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+    .card, .form-section {
+        padding: 20px;
+    }
+    .auth-card {
+        margin: 20px auto;
+    }
+    .logo {
+        max-width: 150px; /* un po' ridotto su mobile ma sempre grande */
+    }
+}
