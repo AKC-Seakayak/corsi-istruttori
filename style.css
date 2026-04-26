@@ -17,6 +17,7 @@ body {
     margin: 0 auto;
 }
 
+/* Logo grande sopra la barra */
 .logo-large {
     text-align: left;
     margin-bottom: 20px;
@@ -29,6 +30,7 @@ body {
     padding: 0;
 }
 
+/* Header */
 header {
     display: flex;
     justify-content: space-between;
@@ -53,6 +55,7 @@ header {
     flex-wrap: wrap;
 }
 
+/* Card generiche */
 .card {
     background: white;
     border: 1px solid #eaeef2;
@@ -86,6 +89,7 @@ header {
     text-align: center;
 }
 
+/* Pulsanti */
 .btn {
     display: inline-block;
     padding: 8px 16px;
@@ -137,6 +141,7 @@ header {
     margin-bottom: 24px;
 }
 
+/* Griglia corsi / allievi */
 .students-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -170,6 +175,7 @@ header {
     margin-top: 16px;
 }
 
+/* Tabelle valutazioni - base */
 .evaluation-table {
     width: 100%;
     border-collapse: collapse;
@@ -189,6 +195,7 @@ header {
     color: #1e2a3e;
 }
 
+/* Select valutazione */
 .evaluation-select {
     width: auto;
     min-width: 140px;
@@ -200,6 +207,7 @@ header {
     cursor: pointer;
 }
 
+/* Accordion */
 .accordion-section {
     margin-bottom: 20px;
     border: 1px solid #eaeef2;
@@ -234,6 +242,7 @@ header {
     padding: 18px;
 }
 
+/* Sezioni singole (attrezzatura, psico) */
 .single-evaluation {
     background: #fafafa;
     padding: 16px;
@@ -247,6 +256,7 @@ header {
     margin-top: 0;
 }
 
+/* Note */
 .note-cell {
     display: flex;
     gap: 8px;
@@ -265,6 +275,7 @@ header {
     background: #e2e8f0;
 }
 
+/* Form */
 .form-section {
     background: white;
     border: 1px solid #eaeef2;
@@ -300,6 +311,7 @@ input:focus, select:focus, textarea:focus {
     border-color: #5b6e8c;
 }
 
+/* Checkbox */
 .checkbox-group {
     display: flex;
     flex-direction: row;
@@ -323,6 +335,7 @@ input:focus, select:focus, textarea:focus {
     accent-color: #1e2a3e;
 }
 
+/* Modal */
 .modal {
     position: fixed;
     top: 0;
@@ -381,6 +394,7 @@ h3 {
     margin: 20px 0 12px 0;
 }
 
+/* Stampa */
 @media print {
     body {
         background: white;
@@ -407,66 +421,58 @@ h3 {
     }
 }
 
+/* ============================================
+   RESPONSIVE PER MOBILE (schermi stretti)
+   ============================================ */
 @media (max-width: 768px) {
-    .evaluation-table,
+    /* Tabella scorrevole orizzontalmente, niente nascondimenti */
+    .evaluation-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
     .evaluation-table thead,
     .evaluation-table tbody,
-    .evaluation-table tr {
-        display: block;
-        width: 100%;
-    }
-    .evaluation-table thead {
-        display: none;
+    .evaluation-table tr,
+    .evaluation-table td,
+    .evaluation-table th {
+        display: table-cell;
     }
     .evaluation-table tr {
-        border: 1px solid #eaeef2;
-        border-radius: 16px;
-        margin-bottom: 20px;
-        padding: 16px;
+        display: table-row;
+    }
+    /* Prima colonna sticky per leggibilità */
+    .evaluation-table td:first-child,
+    .evaluation-table th:first-child {
+        position: sticky;
+        left: 0;
         background: white;
+        z-index: 1;
+        min-width: 180px;
     }
-    .evaluation-table td {
-        display: block;
-        width: 100%;
-        padding: 8px 0;
-        border: none;
-        text-align: left;
-    }
-    .evaluation-table td:first-child {
-        font-weight: 700;
-        font-size: 1rem;
-        margin-bottom: 8px;
-        padding-bottom: 4px;
-        border-bottom: 1px solid #eaeef2;
-    }
+    /* Select più compatti ma non tagliati */
     .evaluation-select {
-        width: 100%;
-        min-width: auto;
-        margin-top: 6px;
+        width: auto;
+        min-width: 130px;
+        font-size: 0.8rem;
+        padding: 6px;
     }
+    /* Le note si impilano */
     .note-cell {
         flex-direction: column;
-        gap: 8px;
-        margin-top: 8px;
+        align-items: stretch;
     }
     .note-cell textarea {
         width: 100%;
     }
-    .delete-note-btn {
-        align-self: flex-start;
-    }
-    .single-evaluation {
-        padding: 12px;
-    }
-    .single-evaluation select,
-    .single-evaluation textarea {
-        width: 100%;
-    }
+    /* Checkbox in colonna */
     .checkbox-group {
         flex-direction: column;
         align-items: flex-start;
         gap: 12px;
     }
+    /* Padding ridotto per il corpo */
     body, .container, .form-section, .card {
         padding-left: 12px;
         padding-right: 12px;
