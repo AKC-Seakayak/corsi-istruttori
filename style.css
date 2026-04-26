@@ -170,6 +170,7 @@ header {
     margin-top: 16px;
 }
 
+/* Tabella base (desktop) */
 .evaluation-table {
     width: 100%;
     border-collapse: collapse;
@@ -407,31 +408,72 @@ h3 {
     }
 }
 
-/* ========== SOLO CORREZIONE MOBILE ========== */
+/* ========== RESPONSIVE MOBILE: BLOCCHI VERTICALI ========== */
 @media (max-width: 768px) {
-    /* Tabella scorrevole orizzontalmente per vedere tutte le manovre */
-    .evaluation-table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
+    /* Disattiva il layout tabellare */
+    .evaluation-table,
     .evaluation-table thead,
     .evaluation-table tbody,
     .evaluation-table tr,
     .evaluation-table td,
     .evaluation-table th {
-        display: table-cell;
+        display: block;
     }
+    /* Nasconde l'intestazione (le colonne non servono più) */
+    .evaluation-table thead {
+        display: none;
+    }
+    /* Ogni riga = blocco */
     .evaluation-table tr {
-        display: table-row;
+        border: 1px solid #eaeef2;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        padding: 16px;
+        background: white;
     }
-    /* Checkbox in colonna */
+    /* Ogni cella impilata */
+    .evaluation-table td {
+        display: block;
+        width: 100%;
+        padding: 8px 0;
+        border: none;
+        text-align: left;
+    }
+    /* Abilità in grassetto con bordo sotto */
+    .evaluation-table td:first-child {
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #eaeef2;
+    }
+    /* Select valutazione: larghezza piena */
+    .evaluation-select {
+        width: 100%;
+        min-width: auto;
+        margin-bottom: 8px;
+    }
+    /* Note: textarea larga, bottone sotto o a lato? Lasciamo flessibile */
+    .note-cell {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin-top: 4px;
+    }
+    .note-cell textarea {
+        width: 100%;
+    }
+    .delete-note-btn {
+        align-self: flex-start;
+        margin-top: 0;
+    }
+    /* Checkbox certificati in colonna */
     .checkbox-group {
         flex-direction: column;
         align-items: flex-start;
         gap: 12px;
     }
-    /* Padding ridotto */
+    /* Riduce padding generale per spazio */
     body, .container, .form-section, .card {
         padding-left: 12px;
         padding-right: 12px;
