@@ -125,6 +125,110 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('register-email').value = '';
             document.getElementById('register-password').value = '';
         }
+            // === AGGIUNTA STAMPA SINGOLA ALLIEVO ===
+    async function printSingleStudent(student) {
+        if (!student) return;
+        const course = coursesList.find(c => c.id === currentCourseId);
+        if (!course) return;
+        const evaluationItems = getEvaluationItemsForCourse(course.level);
+        const logoHtml = `<div style="text-align:center; margin-bottom:15px;"><img src="logo-fict.png" style="max-width:80px;"></div>`;
+        const studentHtml = `
+            ${logoHtml}
+            <h3>${escapeHtml(student.name)} ${escapeHtml(student.surname)}</h3>
+            <p><strong>Nato:</strong> ${student.birthDate || '-'}<br>
+            <strong>Indirizzo:</strong> ${escapeHtml(student.address || '-')}<br>
+            <strong>Telefono:</strong> ${escapeHtml(student.phone || '-')}<br>
+            <strong>Email:</strong> ${escapeHtml(student.email || '-')}<br>
+            <strong>Certificato medico:</strong> ${student.medicalCert ? 'Sì' : 'No'} | <strong>BLSD:</strong> ${student.blsdCert ? 'Sì' : 'No'}<br>
+            <strong>Altri brevetti:</strong> ${escapeHtml(student.otherPatents || '-')}</p>
+            
+            <h4>Valutazioni tecniche</h4>
+            <table border="1" cellpadding="4" style="border-collapse:collapse; width:100%; margin-bottom:15px;">
+                <thead><tr><th>Abilità</th><th>Valutazione</th><th>Note</th></tr></thead>
+                <tbody>
+                    ${evaluationItems.map(item => {
+                        const v = student.evaluations?.[item] || {};
+                        return `<tr><td>${escapeHtml(item)}</td><td>${getValutazioneLabel(v.score)}</td><td>${escapeHtml(v.note || '')}</td></tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+            
+            <h4>Attrezzatura</h4>
+            <table border="1" cellpadding="4" style="width:100%;">
+                <tr><th>Valutazione</th><td>${getValutazioneLabel(student.attrezzatura?.score)}</td></tr>
+                <tr><th>Note</th><td>${escapeHtml(student.attrezzatura?.note || '')}</td></tr>
+            </table>
+            
+            <h4>Valutazioni didattiche</h4>
+            <table border="1" cellpadding="4" style="width:100%;">
+                <thead><tr><th>Campo</th><th>Valutazione</th><th>Note</th></tr></thead>
+                <tbody>
+                    ${didatticheItems.map(item => {
+                        const v = student.didattiche?.[item] || {};
+                        return `<tr><td>${escapeHtml(item)}</td><td>${getValutazioneLabel(v.score)}</td><td>${escapeHtml(v.note || '')}</td></tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+            
+            <h4>Capacità psico-attitudinali</h4>
+            <table border="1" cellpadding="4" style="width:100%;">
+                <tr><th>Valutazione</th><td>${getValutazioneLabel(student.psicoAttitudinali?.score)}</td></tr>
+                <tr><th>Note</th><td>${escapeHtml(student.psicoAttitudinali?.note || '')}</td></tr>
+            </table>
+            
+            <h4>Giudizio finale</h4>
+            <p>${escapeHtml(student.giudizioFinale || '')}</p>
+        `;
+        const fullHtml = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${escapeHtml(student.name)} ${escapeHtml(student.surname)} - Scheda</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    h3, h4 { margin: 10px 0; }
+                    table { border-collapse: collapse; width: 100%; margin-bottom: 15px; }
+                    th, td { border: 1px solid #aaa; padding: 6px; text-align: left; vertical-align: top; }
+                    th { background: #f0f0f0; }
+                </style>
+            </head>
+            <body>
+                <h2>${escapeHtml(course.name)} - Scheda Allievo</h2>
+                <p>Data: ${new Date().toLocaleString()}</p>
+                ${studentHtml}
+            </body>
+            </html>
+        `;
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        document.body.appendChild(iframe);
+        const iframeDoc = iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(fullHtml);
+        iframeDoc.close();
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        setTimeout(() => document.body.removeChild(iframe), 1000);
+    }
+
+    // Listener per il pulsante di stampa (ID: print-student-btn)
+    const printBtn = document.getElementById('print-student-btn');
+    if (printBtn) {
+        printBtn.addEventListener('click', () => {
+            if (window.currentEditingStudent) {
+                printSingleStudent(window.currentEditingStudent);
+            } else {
+                alert('Nessun allievo selezionato. Apri la scheda prima di stampare.');
+            }
+        });
+    }
+
+    // Assicurati che showStudentEditView imposti window.currentEditingStudent
+    // Se non esiste, aggiungi questa riga all'inizio della funzione showStudentEditView:
+    // window.currentEditingStudent = student;
     });
 
     loginBtn.addEventListener('click', async () => {
