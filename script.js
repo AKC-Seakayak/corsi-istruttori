@@ -41,7 +41,7 @@ const evaluationItemsLevel2Extra = [
     "Appoggio alto continuo",
     "Rolling dx",
     "Rolling sx",
-    "Train di contatto",
+    "Traino di contatto",
     "Traino con cima"
 ];
 const evaluationItemsLevel2 = [...evaluationItemsLevel1, ...evaluationItemsLevel2Extra];
