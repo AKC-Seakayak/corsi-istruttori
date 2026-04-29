@@ -6,57 +6,67 @@ let coursesList = [];
 let allUsersList = [];
 let currentEditingStudent = null;
 
-// Liste abilità tecniche
+// ===================== MANOVRE TECNICHE - LIVELLO 1 (BASE) =====================
 const evaluationItemsLevel1 = [
+    "Imbarco asciutto",
+    "Imbarco alla Cowboy",
+    "Imbarco con Bilanciere",
+    "Sbarco con Bilanciere",
+    "Sbarco alla Cowboy",
+    "Trasporto Kayak",
     "Pagaiata in avanti /groenlandese",
     "Pagaiata indietro /groenlandese",
     "Pagaiata in avanti /europea",
     "Pagaiata indietro /europea",
     "Pagaiata circolare 360°",
-    "Spostamento laterale a un tempo",
+    "Sbarco a un tempo",
     "Spostamento laterale continuo",
-    "Timonata di Poppa",
+    "Timonata di poppa",
     "Appoggio basso",
-    "Trasporto kayak",
-    "Imbarco asciutto",
-    "Imbarco alla cowboy",
-    "Imbarco bilanciere",
-    "Sbarco con bilanciere",
-    "Sbarco cowboy",
-    "Uscita bagnata",
-    "Autosalvataggio Cowboy",
-    "Autosalvataggio con paddlefloat",
-    "Rescue T",
     "Inclinazione dello scafo con equilibrio",
-    "Inclinazione dello scafo con perdita di equilibrio"
+    "Inclinazione dello scafo con perdita di equilibrio",
+    "Uscita bagnata",
+    "Autosalvataggio alla Cowboy",
+    "Autosalvataggio con paddlefloat",
+    "Rescue T"
 ];
 
+// ===================== MANOVRE AGGIUNTIVE - LIVELLO 2 (AVANZATO) =====================
 const evaluationItemsLevel2Extra = [
-    "Timonata di Prua a dx",
-    "Timonata di Prua a sx",
-    "Spostamento laterale con abbrivio dx",
-    "Spostamento laterale con abbrivio sx",
-    "Appoggio alto dx",
-    "Appoggio alto sx",
+    "Spostamento laterale con abbrivio",
+    "Timonata di prua",
+    "Appoggio alto",
     "Appoggio alto continuo",
-    "Rolling dx",
-    "Rolling sx",
+    "Rolling a destra",
+    "Rolling a sinistra",
     "Traino di contatto",
     "Traino con cima"
 ];
+
+// Livello 2: unione delle due liste
 const evaluationItemsLevel2 = [...evaluationItemsLevel1, ...evaluationItemsLevel2Extra];
 
-// Valutazioni didattiche (7 voci)
-const didatticheItems = [
+// ===================== VALUTAZIONI DIDATTICHE =====================
+const didatticheItemsLevel1 = [
     "Introduzione",
     "Dimostrazione",
     "Esplicazione",
     "Attività",
     "Sommario",
     "IDEAS Lezioni Prova eseguite",
-    "Altri metodi didattici utilizzati"
+    "Altri metodi didattici"
 ];
 
+const didatticheItemsLevel2 = [
+    ...didatticheItemsLevel1,
+    "Cartografia",
+    "Oceanografia",
+    "Meteorologia",
+    "Leadership",
+    "Risk Management"
+];
+
+// ===================== OPZIONI VALUTAZIONE (0,3,6,7,8,10) =====================
 const valutazioneOptions = [
     { value: "0", label: "Non valutata (0)" },
     { value: "3", label: "Insufficiente (3)" },
@@ -66,7 +76,20 @@ const valutazioneOptions = [
     { value: "10", label: "Ottimo (10)" }
 ];
 
-// ===================== FUNZIONI EXPORT/IMPORT =====================
+// ===================== FUNZIONI DI UTILITÀ =====================
+function getEvaluationItemsForCourse(courseLevel) {
+    return courseLevel === 2 ? evaluationItemsLevel2 : evaluationItemsLevel1;
+}
+
+function getDidatticheItemsForCourse(courseLevel) {
+    return courseLevel === 2 ? didatticheItemsLevel2 : didatticheItemsLevel1;
+}
+
+function getValutazioneLabel(value) {
+    const opt = valutazioneOptions.find(o => o.value == value);
+    return opt ? opt.label : "Non valutata (0)";
+}
+
 function downloadFile(content, fileName, mimeType) {
     const blob = new Blob([content], { type: mimeType });
     const link = document.createElement('a');
@@ -98,6 +121,8 @@ async function exportCourse(format) {
     studentsSnap.forEach(doc => {
         if (doc.data().courseId === currentCourseId) allievi.push({ id: doc.id, ...doc.data() });
     });
+    const evaluationItems = getEvaluationItemsForCourse(course.level);
+    const didatticheItems = getDidatticheItemsForCourse(course.level);
     const data = allievi.map(s => ({
         "Nome": s.name,
         "Cognome": s.surname,
@@ -124,6 +149,8 @@ async function exportStudent(format) {
     if (!currentEditingStudent) return alert("Nessun allievo selezionato");
     const s = currentEditingStudent;
     const course = coursesList.find(c => c.id === currentCourseId);
+    const evaluationItems = getEvaluationItemsForCourse(course?.level || 1);
+    const didatticheItems = getDidatticheItemsForCourse(course?.level || 1);
     const data = [{
         "Corso": course?.name || "",
         "Nome": s.name,
@@ -162,6 +189,7 @@ async function importStudentsFromExcel(file, courseId) {
     });
 }
 
+// ===================== INIZIALIZZAZIONE E GESTIONE AUTENTICAZIONE =====================
 document.addEventListener('DOMContentLoaded', () => {
     const authContainer = document.getElementById('auth-container');
     const appContainer = document.getElementById('app-container');
@@ -184,15 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeAssignModal = document.querySelector('.close-assign-modal');
     const saveAssignmentsBtn = document.getElementById('save-assignments-btn');
     let currentAssignCourse = null;
-
-    function getEvaluationItemsForCourse(courseLevel) {
-        return courseLevel === 2 ? evaluationItemsLevel2 : evaluationItemsLevel1;
-    }
-
-    function getValutazioneLabel(value) {
-        const opt = valutazioneOptions.find(o => o.value == value);
-        return opt ? opt.label : "Non valutata (0)";
-    }
 
     window.onAuthStateChanged(window.auth, async (user) => {
         if (user) {
@@ -372,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ===================== STAMPA CORSO (logo 180px) =====================
+    // ===================== STAMPA CORSO =====================
     async function printCourse(opt_title = "Stampa Corso") {
         if (!currentCourseId) return;
         const course = coursesList.find(c => c.id === currentCourseId);
@@ -383,6 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (doc.data().courseId === currentCourseId) courseStudents.push({ id: doc.id, ...doc.data() });
         });
         const evaluationItems = getEvaluationItemsForCourse(course.level);
+        const didatticheItems = getDidatticheItemsForCourse(course.level);
         const logoHtml = `<div style="text-align:center; margin-bottom:15px;"><img src="logo-fict.png" alt="FICT Logo" style="max-width:180px; height:auto;"></div>`;
         let studentsHtml = '';
         for (let i = 0; i < courseStudents.length; i++) {
@@ -403,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <tbody>
                             ${evaluationItems.map(item => {
                                 const v = s.evaluations?.[item] || {};
-                                return `<tr><td>${escapeHtml(item)}</td><td>${getValutazioneLabel(v.score)}</td><td>${escapeHtml(v.note || '')}</td></tr>`;
+                                return `<tr></tr>${escapeHtml(item)}</td><td>${getValutazioneLabel(v.score)}</td><td>${escapeHtml(v.note || '')}</td></tr>`;
                             }).join('')}
                         </tbody>
                     </table>
@@ -411,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h4>Attrezzatura</h4>
                     <table border="1" cellpadding="4" style="width:100%; margin-bottom:15px;">
                         <tr><th>Valutazione</th><td>${getValutazioneLabel(s.attrezzatura?.score)}</td></tr>
-                        <tr><th>Note</th><td>${escapeHtml(s.attrezzatura?.note || '')}</tr></tr>
+                        <tr><th>Note</th><td>${escapeHtml(s.attrezzatura?.note || '')}</td></tr>
                     </table>
                     
                     <h4>Valutazioni didattiche</h4>
@@ -474,12 +494,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     printCourseBtn.addEventListener('click', () => printCourse("Stampa Corso"));
 
-    // ===================== STAMPA SINGOLA ALLIEVO (logo 180px) =====================
+    // ===================== STAMPA SINGOLA ALLIEVO =====================
     async function printSingleStudent(student, title = "Stampa Scheda") {
         if (!student) return;
         const course = coursesList.find(c => c.id === currentCourseId);
         if (!course) return;
         const evaluationItems = getEvaluationItemsForCourse(course.level);
+        const didatticheItems = getDidatticheItemsForCourse(course.level);
         const logoHtml = `<div style="text-align:center; margin-bottom:15px;"><img src="logo-fict.png" alt="FICT Logo" style="max-width:180px; height:auto;"></div>`;
         const studentHtml = `
             ${logoHtml}
@@ -512,10 +533,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <tbody>
                     ${didatticheItems.map(item => {
                         const v = student.didattiche?.[item] || {};
-                        return `<tr><td>${escapeHtml(item)}</td><td>${getValutazioneLabel(v.score)}</td><td>${escapeHtml(v.note || '')}</td></tr>`;
+                        return `<table><td><strong>${escapeHtml(item)}</strong></td><td>${getValutazioneLabel(v.score)}</td><td>${escapeHtml(v.note || '')}</td></tr>`;
                     }).join('')}
                 </tbody>
-            </tr>
+            </table>
             
             <h4>Capacità psico-attitudinali</h4>
             <table border="1" cellpadding="4" style="width:100%; margin-bottom:15px;">
@@ -580,6 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const rows = await importStudentsFromExcel(file);
             const course = coursesList.find(c => c.id === currentCourseId);
             const evaluationItems = getEvaluationItemsForCourse(course?.level || 1);
+            const didatticheItems = getDidatticheItemsForCourse(course?.level || 1);
             for (const row of rows) {
                 const studentData = {
                     name: row["Nome"] || "",
@@ -788,6 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('student-form-container');
         const course = coursesList.find(c => c.id === currentCourseId);
         const evaluationItems = getEvaluationItemsForCourse(course?.level || 1);
+        const didatticheItems = getDidatticheItemsForCourse(course?.level || 1);
 
         let evaluations = {};
         if (student?.evaluations) evaluations = student.evaluations;
@@ -805,6 +828,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return valutazioneOptions.map(opt => `<option value="${opt.value}" ${currentValue == opt.value ? 'selected' : ''}>${escapeHtml(opt.label)}</option>`).join('');
         }
 
+        // Generazione righe tecniche
         let techRows = '';
         for (const item of evaluationItems) {
             const val = evaluations[item]?.score || "0";
@@ -812,13 +836,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const safeItem = escapeHtml(item);
             techRows += `
                 <tr>
-                    <td><strong>${safeItem}</strong></td>
-                    <td><select class="evaluation-select" data-type="tech" data-item="${safeItem}">${makeSelect(val)}</select></td>
-                    <td><div class="note-cell"><textarea class="note-textarea" data-type="tech" data-item="${safeItem}" rows="2">${escapeHtml(note)}</textarea><button class="delete-note-btn" data-type="tech" data-item="${safeItem}">🗑 Cancella</button></div></td>
+                    <td data-label="Abilità"><strong>${safeItem}</strong></td>
+                    <td data-label="Valutazione"><select class="evaluation-select" data-type="tech" data-item="${safeItem}">${makeSelect(val)}</select></td>
+                    <td data-label="Note"><div class="note-cell"><textarea class="note-textarea" data-type="tech" data-item="${safeItem}" rows="2">${escapeHtml(note)}</textarea><button class="delete-note-btn" data-type="tech" data-item="${safeItem}">🗑 Cancella</button></div></td>
                 </tr>
             `;
         }
 
+        // Generazione righe didattiche
         let didatRows = '';
         for (const item of didatticheItems) {
             const val = didattiche[item]?.score || "0";
@@ -826,9 +851,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const safeItem = escapeHtml(item);
             didatRows += `
                 <tr>
-                    <td><strong>${safeItem}</strong></td>
-                    <td><select class="evaluation-select" data-type="didat" data-item="${safeItem}">${makeSelect(val)}</select></td>
-                    <td><div class="note-cell"><textarea class="note-textarea" data-type="didat" data-item="${safeItem}" rows="2">${escapeHtml(note)}</textarea><button class="delete-note-btn" data-type="didat" data-item="${safeItem}">🗑 Cancella</button></div></td>
+                    <td data-label="Campo"><strong>${safeItem}</strong></td>
+                    <td data-label="Valutazione"><select class="evaluation-select" data-type="didat" data-item="${safeItem}">${makeSelect(val)}</select></td>
+                    <td data-label="Note"><div class="note-cell"><textarea class="note-textarea" data-type="didat" data-item="${safeItem}" rows="2">${escapeHtml(note)}</textarea><button class="delete-note-btn" data-type="didat" data-item="${safeItem}">🗑 Cancella</button></div></td>
                 </tr>
             `;
         }
@@ -901,7 +926,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         container.innerHTML = formHTML;
 
-        // Inizializza accordion
+        // Inizializza accordion (uno alla volta)
         const accordions = document.querySelectorAll('.accordion-section');
         accordions.forEach(section => {
             const header = section.querySelector('.accordion-header');
@@ -919,7 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Cancellazione note
+        // Cancellazione note tecniche/didattiche
         document.querySelectorAll('.delete-note-btn[data-type]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const type = btn.getAttribute('data-type');
