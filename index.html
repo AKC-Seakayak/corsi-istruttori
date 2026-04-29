@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Sea Kayak Trainer FICT - Gestione Corsi Istruttori Marini</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Libreria SheetJS per export/import Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDYE2PQiqYn5INBInSI5mCr_xhffHR3bQU",
+            authDomain: "seatrainer-457de.firebaseapp.com",
+            projectId: "seatrainer-457de",
+            storageBucket: "seatrainer-457de.firebasestorage.app",
+            messagingSenderId: "869282330869",
+            appId: "1:869282330869:web:bd1fd6822cb770d87badbc"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        window.auth = auth;
+        window.db = db;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signOut = signOut;
+        window.updatePassword = updatePassword;
+        window.reauthenticateWithCredential = reauthenticateWithCredential;
+        window.EmailAuthProvider = EmailAuthProvider;
+        window.collection = collection;
+        window.doc = doc;
+        window.getDocs = getDocs;
+        window.getDoc = getDoc;
+        window.addDoc = addDoc;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.setDoc = setDoc;
+        window.onAuthStateChanged = onAuthStateChanged;
+    </script>
+    <script type="module" src="script.js"></script>
+</head>
+<body>
+    <!-- Schermata di login/registrazione -->
+    <div id="auth-container" class="container">
+        <div class="card auth-card">
+            <div class="logo-container">
+                <img src="logo-fict.png" alt="FICT Logo" class="logo">
+                <div class="logo-text">FEDERAZIONE ITALIANA CANOA TURISTICA<br>di Fiume, di Lago, di Mare</div>
+            </div>
+            <h1>SEA KAYAK TRAINER FICT</h1>
+            <h2>Gestione Corsi Istruttori Marini</h2>
+            <div id="auth-forms">
+                <div class="form-group">
+                    <input type="email" id="login-email" placeholder="Email" autocomplete="email">
+                    <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+                    <button id="login-btn" class="btn primary">Accedi</button>
+                </div>
+                <hr>
+                <div class="form-group">
+                    <input type="email" id="register-email" placeholder="Nuova Email">
+                    <input type="password" id="register-password" placeholder="Nuova Password">
+                    <button id="register-btn" class="btn secondary">Registrati</button>
+                </div>
+            </div>
+            <div id="auth-message" class="message"></div>
+        </div>
+    </div>
+
+    <!-- App principale (dopo login) -->
+    <div id="app-container" class="container" style="display: none;">
+        <div class="logo-large">
+            <img src="logo-fict.png" alt="FICT Logo">
+        </div>
+        <header>
+            <div class="header-left">
+                <h1>SEA KAYAK TRAINER FICT</h1>
+            </div>
+            <div class="user-bar">
+                <span id="user-email"></span>
+                <button id="admin-btn" class="btn small" style="display: none;">👥 Gestione Utenti</button>
+                <button id="change-password-btn" class="btn small">Cambia Password</button>
+                <button id="logout-btn" class="btn small danger">Logout</button>
+            </div>
+        </header>
+
+        <!-- VISTA CORSI -->
+        <div id="courses-view">
+            <div class="toolbar" style="justify-content: flex-start;">
+                <button id="add-course-btn" class="btn primary" style="display: none;">+ Nuovo Corso</button>
+            </div>
+            <div id="courses-grid" class="students-grid"></div>
+        </div>
+
+        <!-- VISTA ALLIEVI DI UN CORSO -->
+        <div id="course-students-view" style="display: none;">
+            <button id="back-to-courses-btn" class="btn secondary">← Torna ai Corsi</button>
+            <h2 id="course-title"></h2>
+            <div class="toolbar" style="justify-content: flex-start;">
+                <button id="add-student-to-course-btn" class="btn primary">+ Nuovo Allievo</button>
+                <button id="print-course-btn" class="btn secondary">🖨️ Stampa Corso</button>
+                <button id="export-course-xlsx" class="btn secondary">📊 Esporta Corso (XLSX)</button>
+                <button id="export-course-csv" class="btn secondary">📄 Esporta Corso (CSV)</button>
+                <button id="import-course-btn" class="btn secondary">📂 Importa Allievi</button>
+            </div>
+            <div id="students-by-course-grid" class="students-grid"></div>
+        </div>
+
+        <!-- VISTA MODIFICA ALLIEVO (SCHEDA) -->
+        <div id="student-edit-view" style="display: none;">
+            <button id="back-to-students-btn" class="btn secondary">← Torna agli Allievi</button>
+            <div id="student-form-container"></div>
+            <div class="toolbar" style="justify-content: flex-start; margin-top: 20px;">
+                <button id="print-student-btn" class="btn secondary">🖨️ Stampa PDF Scheda</button>
+                <button id="export-student-xlsx" class="btn secondary">📊 Esporta Scheda (XLSX)</button>
+                <button id="export-student-csv" class="btn secondary">📄 Esporta Scheda (CSV)</button>
+            </div>
+        </div>
+
+        <!-- VISTA GESTIONE UTENTI (admin) -->
+        <div id="admin-view" style="display: none;">
+            <button id="back-from-admin-btn" class="btn secondary">← Torna ai Corsi</button>
+            <h2>Gestione Utenti</h2>
+            <div id="users-list" class="students-grid"></div>
+        </div>
+    </div>
+
+    <!-- Modal Cambio Password -->
+    <div id="password-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Cambia Password</h3>
+            <div class="form-group">
+                <input type="password" id="current-password" placeholder="Password attuale">
+                <input type="password" id="new-password" placeholder="Nuova password">
+                <input type="password" id="confirm-password" placeholder="Conferma nuova password">
+                <button id="confirm-password-btn" class="btn primary">Conferma</button>
+            </div>
+            <div id="password-message" class="message"></div>
+        </div>
+    </div>
+
+    <!-- Modal Assegnazioni Utenti -->
+    <div id="assign-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-assign-modal">&times;</span>
+            <h3>Gestione Assegnazioni</h3>
+            <p>Corso: <strong id="assign-course-name"></strong></p>
+            <div id="assign-users-list"></div>
+            <button id="save-assignments-btn" class="btn primary">Salva Assegnazioni</button>
+            <div id="assign-message" class="message"></div>
+        </div>
+    </div>
+</body>
+</html>
