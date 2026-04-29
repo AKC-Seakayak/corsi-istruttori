@@ -19,7 +19,7 @@ const evaluationItemsLevel1 = [
     "Pagaiata in avanti /europea",
     "Pagaiata indietro /europea",
     "Pagaiata circolare 360°",
-    "Sbarco a un tempo",
+    "Spostamento laterale a un tempo",
     "Spostamento laterale continuo",
     "Timonata di poppa",
     "Appoggio basso",
