@@ -54,7 +54,7 @@ const didatticheItems = [
     "Attività",
     "Sommario",
     "IDEAS Lezioni Prova eseguite",
-    "Altri metodi didattici"
+    "Altri metodi didattici utilizzati"
 ];
 
 const valutazioneOptions = [
