@@ -1,0 +1,15 @@
+{
+  "name": "Sea Kayak Trainer FICT",
+  "short_name": "SeaTrainer",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f4c81",
+  "icons": [
+    {
+      "src": "logo-fict.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}
