@@ -16,7 +16,7 @@ const evaluationItemsLevel1 = [
     "Sbarco con Bilanciere", "Sbarco alla Cowboy", "Trasporto Kayak",
     "Pagaiata in avanti /groenlandese", "Pagaiata indietro /groenlandese",
     "Pagaiata in avanti /europea", "Pagaiata indietro /europea",
-    "Pagaiata circolare 360°", "Sbarco a un tempo", "Spostamento laterale continuo",
+    "Pagaiata circolare 360°", "Spostamento laterale a un tempo", "Spostamento laterale continuo",
     "Timonata di poppa", "Appoggio basso", "Inclinazione dello scafo con equilibrio",
     "Inclinazione dello scafo con perdita di equilibrio", "Uscita bagnata",
     "Autosalvataggio alla Cowboy", "Autosalvataggio con paddlefloat", "Rescue T"
